@@ -1,0 +1,28 @@
+{
+  "groups": [
+    {
+      "name": "wx.jwt",
+      "type": "com.lixingyong.meneusoft.common.utils.JwtUtils",
+      "sourceType": "com.lixingyong.meneusoft.common.utils.JwtUtils"
+    }
+  ],
+  "properties": [
+    {
+      "name": "wx.jwt.expire",
+      "type": "java.lang.Long",
+      "sourceType": "com.lixingyong.meneusoft.common.utils.JwtUtils",
+      "defaultValue": 0
+    },
+    {
+      "name": "wx.jwt.header",
+      "type": "java.lang.String",
+      "sourceType": "com.lixingyong.meneusoft.common.utils.JwtUtils"
+    },
+    {
+      "name": "wx.jwt.secret",
+      "type": "java.lang.String",
+      "sourceType": "com.lixingyong.meneusoft.common.utils.JwtUtils"
+    }
+  ],
+  "hints": []
+}

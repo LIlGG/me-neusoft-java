@@ -1,0 +1,8 @@
+spring:
+  profiles:
+    active: pro
+server:
+  port: 9999
+logging:
+  file: /var/tmp/meneusoft.log
+  level: WARN
