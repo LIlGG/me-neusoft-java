@@ -1,1 +1,0 @@
-ret=0,redir=/remote/login?&err=sslvpn_login_permission_denied&lang=GB2312
