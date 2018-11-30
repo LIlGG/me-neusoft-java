@@ -1,5 +1,8 @@
 package com.lixingyong.meneusoft.modules.xcx.controller;
 
+import com.lixingyong.meneusoft.common.network.JWCUtil;
+import com.lixingyong.meneusoft.common.network.VPNUtil;
+import com.lixingyong.meneusoft.common.network.WxUtil;
 import com.lixingyong.meneusoft.common.utils.*;
 import com.lixingyong.meneusoft.modules.xcx.annotation.Token;
 import com.lixingyong.meneusoft.modules.xcx.entity.WxUser;
@@ -83,5 +86,7 @@ public class WxSafetyController {
         String check_url = VPNUtil.loginCheck();
         VPNUtil.getSVpnCookie(check_url);
         VPNUtil.getSessionId();
+        JWCUtil.getJWCCookie(1);
+        JWCUtil.getJWCInfo(1);
     }
 }
