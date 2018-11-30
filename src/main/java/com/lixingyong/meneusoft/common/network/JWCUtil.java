@@ -101,9 +101,7 @@ public class JWCUtil {
                 viewState = viewState.substring(viewState.indexOf("value")+7,body.lastIndexOf(">"));
                 String pcInfo = body.substring(body.indexOf("Mozilla"));
                 pcInfo = pcInfo.substring(0,pcInfo.indexOf("\""));
-                //处理验证码
-
-
+                //处理验证码 使用第三方接口
                 System.out.println(body);
                 System.out.println(viewState);
                 System.out.println(pcInfo);
