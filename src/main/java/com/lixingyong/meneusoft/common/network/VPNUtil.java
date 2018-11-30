@@ -93,6 +93,7 @@ public class VPNUtil {
         HttpEntity<String> request = new HttpEntity<>(null,headers);//将参数和header组成一个请求
         ResponseEntity<String> responseEntity = restTemplate.exchange(VPNAPI.VPN+url,HttpMethod.GET,request,String.class);
         if(responseEntity.getStatusCode().is2xxSuccessful()){
+            System.out.println(responseEntity.getHeaders().toString());
             if(responseEntity.getHeaders().get("Set-Cookie").size() > 0){
                 if(responseEntity.getHeaders().get("Set-Cookie").get(0).startsWith("SVPNCOOKIE")){
                     String[] cookies = responseEntity.getHeaders().get("Set-Cookie").get(0).split(";");

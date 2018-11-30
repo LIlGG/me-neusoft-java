@@ -97,14 +97,17 @@ public class JWCUtil {
         if(responseEntity.getStatusCode().is2xxSuccessful()){
             if(responseEntity.getBody().indexOf("__VIEWSTATE") > 0){
                 String body = responseEntity.getBody();
-                String viewState = body.substring(body.indexOf("__VIEWSTATE"),body.lastIndexOf("id=\"pcInfo\""));
-                viewState = viewState.substring(viewState.indexOf("value")+7,body.lastIndexOf(">"));
-                String pcInfo = body.substring(body.indexOf("Mozilla"));
-                pcInfo = pcInfo.substring(0,pcInfo.indexOf("\""));
-                //处理验证码 使用第三方接口
                 System.out.println(body);
+                String viewState = body.substring(body.indexOf("__VIEWSTATE"),body.lastIndexOf("id=\"pcInfo\""));
+                viewState = viewState.substring(viewState.indexOf("value")+7,viewState.lastIndexOf("\""));
                 System.out.println(viewState);
-                System.out.println(pcInfo);
+//                String pcInfo = body.substring(body.indexOf("Mozilla"));
+//                pcInfo = pcInfo.substring(0,pcInfo.indexOf("\""));
+//                System.out.println(pcInfo);
+                //处理验证码 使用第三方接口
+
+
+
             }
         }
         return null;
