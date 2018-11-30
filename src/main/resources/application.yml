@@ -44,16 +44,19 @@ spring:
         min-idle: 0
 wx:
   jwt:
-    secret: gts0gm088mc096ad99173hrrsfsg8xb9[www.lixingyong.com]
+    # 你的secret密匙
+    secret: gts0gm088mc096ad923453hrrsfsg8xb9[www.lixingyong.com]
     expire: 604800
     header: token
   xcx:
-    appid: wxdcb9fb2e8b409568
-    appsecret: aa428c00f5e758bde71bf64b5f67c3be
+    # 小程序ID和密匙
+    appid: 
+    appsecret: 
 
 neusoft:
-  username: lixingyong15&congyouzhi15
-  password: 209715&350615
+  # 校园网账号密码
+  username: 
+  password: 
 
 mybatis-plus:
   mapper-locations: classpath:mapper/**/*.xml
