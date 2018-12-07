@@ -57,6 +57,6 @@ public class WSExceptionHandler {
     @ExceptionHandler(IOException.class)
     public R handleIOException(IOException e){
         logger.error(e.getMessage(), e);
-        return R.error("错误");
+        return R.error("流错误");
     }
 }

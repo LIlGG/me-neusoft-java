@@ -89,4 +89,15 @@ public class WxSafetyController {
         JWCUtil.getJWCCookie(1);
         JWCUtil.getJWCInfo(1);
     }
+
+
+    @GetMapping(value = "/getValidateCode")
+    public void getValidateCode(){
+        JWCUtil.getValidateCode(1);
+    }
+
+    @GetMapping(value = "/logout")
+    public void vpnlogout(){
+        VPNUtil.logout();
+    }
 }

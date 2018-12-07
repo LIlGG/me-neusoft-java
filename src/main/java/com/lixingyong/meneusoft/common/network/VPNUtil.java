@@ -94,13 +94,15 @@ public class VPNUtil {
         ResponseEntity<String> responseEntity = restTemplate.exchange(VPNAPI.VPN+url,HttpMethod.GET,request,String.class);
         if(responseEntity.getStatusCode().is2xxSuccessful()){
             System.out.println(responseEntity.getHeaders().toString());
-            if(responseEntity.getHeaders().get("Set-Cookie").size() > 0){
-                if(responseEntity.getHeaders().get("Set-Cookie").get(0).startsWith("SVPNCOOKIE")){
-                    String[] cookies = responseEntity.getHeaders().get("Set-Cookie").get(0).split(";");
-                    String svpnCookie = cookies[0];
-                    //将获取到的数据存入redis数据库中并返回
-                    redisUtils.set("SVPNCOOKIE",svpnCookie);
-                    return true;
+            if(responseEntity.getHeaders().containsKey("Set-Cookie")){
+                if(responseEntity.getHeaders().get("Set-Cookie").size() > 0){
+                    if(responseEntity.getHeaders().get("Set-Cookie").get(0).startsWith("SVPNCOOKIE")){
+                        String[] cookies = responseEntity.getHeaders().get("Set-Cookie").get(0).split(";");
+                        String svpnCookie = cookies[0];
+                        //将获取到的数据存入redis数据库中并返回
+                        redisUtils.set("SVPNCOOKIE",svpnCookie);
+                        return true;
+                    }
                 }
             }
         }
@@ -152,6 +154,13 @@ public class VPNUtil {
         return false;
     }
 
+    /**
+     * @Author lixingyong
+     * @Description //TODO 登出VPN
+     * @Date 2018/12/7
+     * @Param []
+     * @return boolean
+     **/
     public static boolean logout(){
         System.setProperty("http.proxyHost", "localhost");
         System.setProperty("http.proxyPort", "8888");

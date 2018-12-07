@@ -2,9 +2,11 @@ package com.lixingyong.meneusoft.common.network;
 
 import com.lixingyong.meneusoft.common.api.JWCAPI;
 import com.lixingyong.meneusoft.common.api.VPNAPI;
+import com.lixingyong.meneusoft.common.exception.WSExcetpion;
 import com.lixingyong.meneusoft.common.utils.RedisUtils;
 import org.apache.http.Header;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.Resource;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
@@ -12,6 +14,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
 
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -54,14 +59,16 @@ public class JWCUtil {
         map.put("sid",redisUtils.get("SID"));
         ResponseEntity<String> responseEntity = restTemplate.exchange(VPNAPI.PROXY+JWCAPI.JWCSID,HttpMethod.GET,request,String.class,map);
         if(responseEntity.getStatusCode().is2xxSuccessful()){
-            if(responseEntity.getHeaders().get("Set-Cookie").size() > 0){
-                if(responseEntity.getHeaders().get("Set-Cookie").get(0).startsWith("ASP")){
-                    String[] cookies = responseEntity.getHeaders().get("Set-Cookie").get(0).split(";");
-                    String ASPCookie = cookies[0];
-                    //将获取到的数据存入redis数据库中并返回
-                    redisUtils.set(Long.toString(uid)+"ASPCOOKIE",ASPCookie);
-                    System.out.println(ASPCookie);
-                    return true;
+            if(responseEntity.getHeaders().containsKey("Set-Cookie")){
+                if(responseEntity.getHeaders().get("Set-Cookie").size() > 0){
+                    if(responseEntity.getHeaders().get("Set-Cookie").get(0).startsWith("ASP")){
+                        String[] cookies = responseEntity.getHeaders().get("Set-Cookie").get(0).split(";");
+                        String ASPCookie = cookies[0];
+                        //将获取到的数据存入redis数据库中并返回
+                        redisUtils.set(Long.toString(uid)+"ASPCOOKIE",ASPCookie);
+                        System.out.println(ASPCookie);
+                        return true;
+                    }
                 }
             }
         }
@@ -71,12 +78,12 @@ public class JWCUtil {
 
     /***
      * @Author lixingyong
-     * @Description //TODO 获取经过处理后的浏览器状态、浏览器信息、验证码信息
+     * @Description //TODO 获取经过处理后的浏览器状态
      * @Date 2018/11/29
      * @Param [uid, studentId, password, center]
      * @return java.util.Map<java.lang.String                                                               ,                                                               java.lang.Object>
      **/
-    public static Map<String,Object> getJWCInfo(long uid){
+    public static void getJWCInfo(long uid){
         System.setProperty("http.proxyHost", "localhost");
         System.setProperty("http.proxyPort", "8888");
         System.setProperty("https.proxyHost", "localhost");
@@ -85,7 +92,7 @@ public class JWCUtil {
         headers.set("User-Agent","Mozilla/5.0 (Windows NT 6.3; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/70.0.3538.102 Safari/537.36");
         // 判断redis中是否存着对应的Cookie
         if(!redisUtils.hasKey("SVPNCOOKIE") || !redisUtils.hasKey(Long.toString(uid)+"ASPCOOKIE") || !redisUtils.hasKey("SID")){
-            return null;
+            return ;
         }
         List<String> cookiesList = new ArrayList<>();
         cookiesList.add(redisUtils.get("SVPNCOOKIE"));
@@ -97,20 +104,76 @@ public class JWCUtil {
         if(responseEntity.getStatusCode().is2xxSuccessful()){
             if(responseEntity.getBody().indexOf("__VIEWSTATE") > 0){
                 String body = responseEntity.getBody();
-                System.out.println(body);
                 String viewState = body.substring(body.indexOf("__VIEWSTATE"),body.lastIndexOf("id=\"pcInfo\""));
                 viewState = viewState.substring(viewState.indexOf("value")+7,viewState.lastIndexOf("\""));
+                // 保存当前viewState至redis数据库中
+                redisUtils.set(Long.toString(uid)+"VIEWSTATE",viewState);
                 System.out.println(viewState);
 //                String pcInfo = body.substring(body.indexOf("Mozilla"));
 //                pcInfo = pcInfo.substring(0,pcInfo.indexOf("\""));
 //                System.out.println(pcInfo);
-                //处理验证码 使用第三方接口
-
-
-
             }
         }
-        return null;
+        return ;
+    }
+    
+    /**
+     * @Author lixingyong
+     * @Description //TODO 获取验证码（未完善）
+     * @Date 2018/12/7
+     * @Param [uid]
+     * @return void
+     **/
+    public static void getValidateCode(long uid){
+        System.setProperty("http.proxyHost", "localhost");
+        System.setProperty("http.proxyPort", "8888");
+        System.setProperty("https.proxyHost", "localhost");
+        System.setProperty("https.proxyPort", "8888");
+        HttpHeaders headers = new HttpHeaders();
+        headers.set("User-Agent","Mozilla/5.0 (Windows NT 6.3; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/70.0.3538.102 Safari/537.36");
+        // 判断redis中是否存着对应的Cookie
+        if(!redisUtils.hasKey("SVPNCOOKIE") || !redisUtils.hasKey(Long.toString(uid)+"ASPCOOKIE") || !redisUtils.hasKey("SID")){
+            return ;
+        }
+        List<String> cookiesList = new ArrayList<>();
+        cookiesList.add(redisUtils.get("SVPNCOOKIE"));
+        cookiesList.add(redisUtils.get(Long.toString(uid)+"ASPCOOKIE"));
+        headers.put(HttpHeaders.COOKIE,cookiesList); //将Cookies放入Header
+        HttpEntity<String> request = new HttpEntity<>(null,headers);//将参数和header组成一个请求
+        map.put("sid",redisUtils.get("SID"));
+        ResponseEntity<Resource> responseEntity = restTemplate.exchange(VPNAPI.PROXY+JWCAPI.CODE,HttpMethod.GET,request,Resource.class,map);
+        InputStream in = null;
+        FileOutputStream fileOutputStream = null;
+        if(responseEntity.getStatusCode().is2xxSuccessful()){
+            try {
+                in = responseEntity.getBody().getInputStream();
+                byte[] data = new byte[1024];
+                int len = 0;
+
+                fileOutputStream = new FileOutputStream("D:\\test1.jpg");
+                while ((len = in.read(data)) != -1){
+                    fileOutputStream.write(data,0,len);
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+            } finally {
+                if(null != in){
+                    try {
+                        in.close();
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                }
+                if(null != fileOutputStream){
+                    try {
+                        fileOutputStream.close();
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
+        }
+        return ;
     }
     @Autowired(required = true)
     public void setRestTemplate(RestTemplate restTemplate){
