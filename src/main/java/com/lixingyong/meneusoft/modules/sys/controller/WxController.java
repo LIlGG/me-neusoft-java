@@ -2,7 +2,7 @@ package com.lixingyong.meneusoft.modules.sys.controller;
 
 import com.lixingyong.meneusoft.common.utils.Params;
 import com.lixingyong.meneusoft.common.utils.R;
-import com.lixingyong.meneusoft.common.network.WxUtil;
+import com.lixingyong.meneusoft.api.wx.WxUtil;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;

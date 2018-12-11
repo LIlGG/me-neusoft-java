@@ -22,7 +22,6 @@ public class ImagePreProcess {
         //识别样本输出地址
         String ocrResult = "D:\\test2.jpg";
         //去噪点
-
         ImgUtils.cleanLinesInImage(OriginalImg, ocrResult);
         //OCR识别
         String code = Tess4J.executeTess4J(ocrResult);

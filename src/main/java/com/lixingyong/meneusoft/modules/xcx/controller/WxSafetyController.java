@@ -1,8 +1,8 @@
 package com.lixingyong.meneusoft.modules.xcx.controller;
 
-import com.lixingyong.meneusoft.common.network.JWCUtil;
-import com.lixingyong.meneusoft.common.network.VPNUtil;
-import com.lixingyong.meneusoft.common.network.WxUtil;
+import com.lixingyong.meneusoft.api.jwc.JWCUtil;
+import com.lixingyong.meneusoft.api.vpn.VPNUtil;
+import com.lixingyong.meneusoft.api.wx.WxUtil;
 import com.lixingyong.meneusoft.common.utils.*;
 import com.lixingyong.meneusoft.modules.xcx.annotation.Token;
 import com.lixingyong.meneusoft.modules.xcx.entity.WxUser;
