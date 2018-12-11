@@ -18,12 +18,12 @@ public class R extends HashMap<String, Object> implements Serializable {
     private static final long serialVersionUID = 1L;
 
     public R(){
-        put("code", 200);
-        put("msg" , "success");
+        put("code", 0);
+        put("msg" , "获取成功");
     }
 
     public static R error(){
-        return error(HttpStatus.SC_INTERNAL_SERVER_ERROR, "未知错误");
+        return error(HttpStatus.SC_INTERNAL_SERVER_ERROR, "系统错误");
     }
 
     public static R error(String msg){
@@ -46,6 +46,12 @@ public class R extends HashMap<String, Object> implements Serializable {
     public static R ok(Map<String, Object> map) {
         R r = new R();
         r.putAll(map);
+        return r;
+    }
+
+    public static R ok(Object value){
+        R r = new R();
+        r.put("data",value);
         return r;
     }
 

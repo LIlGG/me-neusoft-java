@@ -15,7 +15,7 @@ management:
 spring:
   datasource:
     driverClassName: com.mysql.cj.jdbc.Driver
-    url: "jdbc:mysql://localhost:3306/wxsystem?serverTimezone=GMT%2B8"
+    url: "jdbc:mysql://localhost:3306/me_neusoft?serverTimezone=GMT%2B8"
     username: "root"
     password: "root"
     testOnBorrow: true
@@ -69,6 +69,7 @@ mybatis-plus:
     logic-delete-value: -1
     logic-not-delete-value: 0
     sql-injector: com.baomidou.mybatisplus.mapper.LogicSqlInjector
+    meta-object-handler: com.lixingyong.meneusoft.common.handler.MyMetaObjectHandler
   configuration:
     map-underscore-to-camel-case: true
     cache-enabled: false
