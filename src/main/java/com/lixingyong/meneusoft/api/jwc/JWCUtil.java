@@ -32,6 +32,10 @@ public class JWCUtil {
     private static RestTemplate restTemplate;
     private static RedisUtils redisUtils;
     private static Map<String,Object> map = new HashMap<>();
+    private static int i;
+    {
+        i = 118;
+    }
     /**
      * @Author lixingyong
      * @Description //TODO 获取教务处的Cookie，当前Cookie针对与每个账号而言
@@ -123,6 +127,7 @@ public class JWCUtil {
      * @return void
      **/
     public static void getValidateCode(long uid){
+        i++;
         System.setProperty("http.proxyHost", "localhost");
         System.setProperty("http.proxyPort", "8888");
         System.setProperty("https.proxyHost", "localhost");
@@ -147,8 +152,7 @@ public class JWCUtil {
                 in = responseEntity.getBody().getInputStream();
                 byte[] data = new byte[1024];
                 int len = 0;
-
-                fileOutputStream = new FileOutputStream("D:\\test1.jpg");
+                fileOutputStream = new FileOutputStream("F:\\code\\code"+i+".jpg");
                 while ((len = in.read(data)) != -1){
                     fileOutputStream.write(data,0,len);
                 }

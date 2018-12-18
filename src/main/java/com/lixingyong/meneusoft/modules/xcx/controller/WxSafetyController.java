@@ -12,9 +12,8 @@ import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.RestTemplate;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
+
+import java.util.*;
 
 /**
  * @ClassName WxSafetyController
@@ -83,17 +82,25 @@ public class WxSafetyController {
 
     @GetMapping(value = "/getVPN")
     public void vpn(){
-        String check_url = VPNUtil.loginCheck();
-        VPNUtil.getSVpnCookie(check_url);
-        VPNUtil.getSessionId();
-        JWCUtil.getJWCCookie(1);
-        JWCUtil.getJWCInfo(1);
+        if(VPNUtil.exeVpnLogin()){
+            JWCUtil.getJWCCookie(1);
+        }
+
     }
 
 
     @GetMapping(value = "/getValidateCode")
     public void getValidateCode(){
-        JWCUtil.getValidateCode(1);
+        //抓取图片
+        Timer timer=new Timer();//实例化Timer类
+        TimerTask task = new TimerTask() {
+            @Override
+            public void run() {
+                JWCUtil.getValidateCode(1);
+            }
+        };
+        timer.schedule(task,2 * 1000,2*1000);
+
     }
 
     @GetMapping(value = "/logout")

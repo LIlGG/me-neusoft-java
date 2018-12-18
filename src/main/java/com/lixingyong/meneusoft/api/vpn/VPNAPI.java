@@ -25,4 +25,7 @@ public final class VPNAPI {
 
     /** 授权页面代理前缀 */
     public final static String PROXY = VPN + "/proxy/{sid}/";
+
+    /** 验证VPN登录是否已过期 */
+    public final static String ISLOGIN = GETSID + "?action=6";
 }

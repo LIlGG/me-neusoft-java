@@ -164,6 +164,10 @@
             <artifactId>tess4j</artifactId>
             <version>4.3.0</version>
         </dependency>
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+        </dependency>
     </dependencies>
 
     <build>

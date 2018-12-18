@@ -167,8 +167,8 @@ public class ImgUtils {
                 }
                 //此处根据实际需要进行设定阈值
                 gray[x][y] = (int) Math
-                        .pow((Math.pow(r, 2.2) * 0.2973 + Math.pow(g, 2.2)
-                                * 0.6274 + Math.pow(b, 2.2) * 0.0753), 1 / 2.2);
+                        .pow((Math.pow(r, 2.0) * 0.2973 + Math.pow(g, 2.0)
+                                * 0.6274 + Math.pow(b, 2.0) * 0.0753), 1 / 2.0);
             }
         }
 
@@ -230,21 +230,21 @@ public class ImgUtils {
         }
 
 
-        // 矩阵打印
-        for (int y = 0; y < h; y++)
-        {
-            for (int x = 0; x < w; x++)
-            {
-                if (isBlack(binaryBufferedImage.getRGB(x, y)))
-                {
-                    System.out.print("*");
-                } else
-                {
-                    System.out.print(" ");
-                }
-            }
-            System.out.println();
-        }
+//        // 矩阵打印
+//        for (int y = 0; y < h; y++)
+//        {
+//            for (int x = 0; x < w; x++)
+//            {
+//                if (isBlack(binaryBufferedImage.getRGB(x, y)))
+//                {
+//                    System.out.print("*");
+//                } else
+//                {
+//                    System.out.print(" ");
+//                }
+//            }
+//            System.out.println();
+//        }
         File file = new File(destDir);
             if (!file.exists())
             {
