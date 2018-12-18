@@ -46,6 +46,7 @@ public class  VPNUtil {
         if(isLogin()){
            return true;
         }
+        logger.info("VPN未登录，执行登录流程");
         if(userName.length < 1 || null == userName){
             throw new WSExcetpion("服务器数据错误，请联系管理员!");
         }
@@ -80,7 +81,7 @@ public class  VPNUtil {
      * @Param []
      * @return boolean
      **/
-    private static boolean isLogin(){
+    public static boolean isLogin(){
         logger.info("检测VPN登录状态");
         //获取Header
         HttpHeaders headers = new HttpHeaders();
@@ -97,6 +98,7 @@ public class  VPNUtil {
         if(responseEntity.getStatusCode().is2xxSuccessful()){
             if(null != responseEntity.getBody()){
                 if(responseEntity.getBody().contains("success")) {
+                    logger.info("VPN已登录");
                     return true;
                 }
             }

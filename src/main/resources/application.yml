@@ -45,7 +45,7 @@ spring:
 wx:
   jwt:
     # 你的secret密匙
-    secret: gts0gm088mc096ad923453hrrsfsg8xb9[www.lixingyong.com]
+    secret: gts0gm188mc096ad923453hrrsfsg8xb9[www.lixingyong.com]
     expire: 604800
     header: token
   xcx:

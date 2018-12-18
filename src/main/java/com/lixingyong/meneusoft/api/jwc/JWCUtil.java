@@ -2,7 +2,11 @@ package com.lixingyong.meneusoft.api.jwc;
 
 import com.lixingyong.meneusoft.api.jwc.JWCAPI;
 import com.lixingyong.meneusoft.api.vpn.VPNAPI;
+import com.lixingyong.meneusoft.api.vpn.VPNUtil;
+import com.lixingyong.meneusoft.common.exception.WSExcetpion;
 import com.lixingyong.meneusoft.common.utils.RedisUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.Resource;
 import org.springframework.http.HttpEntity;
@@ -32,10 +36,28 @@ public class JWCUtil {
     private static RestTemplate restTemplate;
     private static RedisUtils redisUtils;
     private static Map<String,Object> map = new HashMap<>();
-    private static int i;
-    {
-        i = 118;
+    private static Logger logger = LoggerFactory.getLogger(JWCUtil.class);
+
+    public static boolean exeJWCLogin(long uid){
+        System.setProperty("http.proxyHost", "localhost");
+        System.setProperty("http.proxyPort", "8888");
+        System.setProperty("https.proxyHost", "localhost");
+        System.setProperty("https.proxyPort", "8888");
+        // 登录VPN
+        if(!VPNUtil.exeVpnLogin()){
+            return false;
+        }
+        logger.info("用户"+uid+"执行登录教务处流程");
+        try {
+            getJWCCookie(uid);
+            getJWCInfo(uid);
+            getValidateCode(uid);
+        }catch (WSExcetpion s){
+
+        }
+        return false;
     }
+
     /**
      * @Author lixingyong
      * @Description //TODO 获取教务处的Cookie，当前Cookie针对与每个账号而言
@@ -43,16 +65,12 @@ public class JWCUtil {
      * @Param [uid] 当前登录账号的Uid，根据Uid获取对应用户的教务处Cookie
      * @return boolean
      **/
-    public static boolean getJWCCookie(long uid){
-        System.setProperty("http.proxyHost", "localhost");
-        System.setProperty("http.proxyPort", "8888");
-        System.setProperty("https.proxyHost", "localhost");
-        System.setProperty("https.proxyPort", "8888");
+    public static void getJWCCookie(long uid) throws WSExcetpion {
         HttpHeaders headers = new HttpHeaders();
         headers.set("User-Agent","Mozilla/5.0 (Windows NT 6.3; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/70.0.3538.102 Safari/537.36");
         /** 获取redis保存的cookies */
         if(!redisUtils.hasKey("SVPNCOOKIE") || !redisUtils.hasKey("SID")){
-            return false;
+            throw new WSExcetpion("redis中不存在SVPNCOOKIE");
         }
         List<String> cookiesList = new ArrayList<>();
         cookiesList.add(redisUtils.get("SVPNCOOKIE"));
@@ -68,13 +86,12 @@ public class JWCUtil {
                         String ASPCookie = cookies[0];
                         //将获取到的数据存入redis数据库中并返回
                         redisUtils.set(Long.toString(uid)+"ASPCOOKIE",ASPCookie);
-                        System.out.println(ASPCookie);
-                        return true;
+                        return;
                     }
                 }
             }
         }
-        return false;
+        throw new WSExcetpion("获取教务处COOKIE失败");
     }
 
 
@@ -85,16 +102,12 @@ public class JWCUtil {
      * @Param [uid, studentId, password, center]
      * @return java.util.Map<java.lang.String                                                               ,                                                               java.lang.Object>
      **/
-    public static void getJWCInfo(long uid){
-        System.setProperty("http.proxyHost", "localhost");
-        System.setProperty("http.proxyPort", "8888");
-        System.setProperty("https.proxyHost", "localhost");
-        System.setProperty("https.proxyPort", "8888");
+    public static void getJWCInfo(long uid) throws WSExcetpion {
         HttpHeaders headers = new HttpHeaders();
         headers.set("User-Agent","Mozilla/5.0 (Windows NT 6.3; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/70.0.3538.102 Safari/537.36");
         // 判断redis中是否存着对应的Cookie
         if(!redisUtils.hasKey("SVPNCOOKIE") || !redisUtils.hasKey(Long.toString(uid)+"ASPCOOKIE") || !redisUtils.hasKey("SID")){
-            return ;
+            throw new WSExcetpion("redis中数据不完善");
         }
         List<String> cookiesList = new ArrayList<>();
         cookiesList.add(redisUtils.get("SVPNCOOKIE"));
@@ -116,7 +129,7 @@ public class JWCUtil {
 //                System.out.println(pcInfo);
             }
         }
-        return ;
+        throw new WSExcetpion("获取教务处登录信息失败");
     }
     
     /**
@@ -127,7 +140,6 @@ public class JWCUtil {
      * @return void
      **/
     public static void getValidateCode(long uid){
-        i++;
         System.setProperty("http.proxyHost", "localhost");
         System.setProperty("http.proxyPort", "8888");
         System.setProperty("https.proxyHost", "localhost");
@@ -152,7 +164,7 @@ public class JWCUtil {
                 in = responseEntity.getBody().getInputStream();
                 byte[] data = new byte[1024];
                 int len = 0;
-                fileOutputStream = new FileOutputStream("F:\\code\\code"+i+".jpg");
+                fileOutputStream = new FileOutputStream("F:\\code\\code1.jpg");
                 while ((len = in.read(data)) != -1){
                     fileOutputStream.write(data,0,len);
                 }
