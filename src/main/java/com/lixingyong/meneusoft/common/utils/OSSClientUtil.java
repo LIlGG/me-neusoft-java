@@ -168,6 +168,7 @@ public class OSSClientUtil {
             PutObjectResult putResult = ossClient.putObject(bucketName, folder + fileName, inputStream, metadata);
             // 解析结果
             resultStr = putResult.getETag();
+            logger.debug("上传阿里云OSS成功");
         } catch (Exception e) {
             e.printStackTrace();
             logger.error("上传阿里云OSS服务器异常." + e.getMessage(), e);

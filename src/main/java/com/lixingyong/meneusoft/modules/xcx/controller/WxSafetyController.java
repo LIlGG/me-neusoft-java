@@ -88,18 +88,30 @@ public class WxSafetyController {
 
     }
 
+    @GetMapping(value = "/getJWC")
+    public void jwc(){
+        JWCUtil.exeJWCLogin(1);
+    }
 
+    /**
+     * @Author lixingyong
+     * @Description //TODO 获取验证码
+     * @Date 2018/12/18
+     * @Param []
+     * @return void
+     **/
     @GetMapping(value = "/getValidateCode")
     public void getValidateCode(){
-        //抓取图片
-        Timer timer=new Timer();//实例化Timer类
-        TimerTask task = new TimerTask() {
-            @Override
-            public void run() {
-                JWCUtil.getValidateCode(1);
-            }
-        };
-        timer.schedule(task,2 * 1000,2*1000);
+        JWCUtil.getValidateCode(1);
+//        //抓取图片
+//        Timer timer=new Timer();//实例化Timer类
+//        TimerTask task = new TimerTask() {
+//            @Override
+//            public void run() {
+//
+//            }
+//        };
+//        timer.schedule(task,2 * 1000,2*1000);
 
     }
 

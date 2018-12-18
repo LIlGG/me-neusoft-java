@@ -1,13 +1,17 @@
 package com.lixingyong.meneusoft.api.jwc;
 
+import com.aliyun.oss.OSSClient;
+import com.aliyun.oss.internal.OSSUtils;
 import com.lixingyong.meneusoft.api.jwc.JWCAPI;
 import com.lixingyong.meneusoft.api.vpn.VPNAPI;
 import com.lixingyong.meneusoft.api.vpn.VPNUtil;
 import com.lixingyong.meneusoft.common.exception.WSExcetpion;
+import com.lixingyong.meneusoft.common.utils.OSSClientUtil;
 import com.lixingyong.meneusoft.common.utils.RedisUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.Resource;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
@@ -36,6 +40,11 @@ public class JWCUtil {
     private static RestTemplate restTemplate;
     private static RedisUtils redisUtils;
     private static Map<String,Object> map = new HashMap<>();
+    /** 阿里云API的bucket名称 */
+    private static String bucketName;
+    /** 阿里云API的文件夹名称 */
+    private static String folder;
+
     private static Logger logger = LoggerFactory.getLogger(JWCUtil.class);
 
     public static boolean exeJWCLogin(long uid){
@@ -52,8 +61,10 @@ public class JWCUtil {
             getJWCCookie(uid);
             getJWCInfo(uid);
             getValidateCode(uid);
+            logger.info("登录教务处流程执行完成");
+            return true;
         }catch (WSExcetpion s){
-
+            logger.error("用户"+uid+"登录教务网失败，错误信息："+s.getMsg());
         }
         return false;
     }
@@ -86,6 +97,7 @@ public class JWCUtil {
                         String ASPCookie = cookies[0];
                         //将获取到的数据存入redis数据库中并返回
                         redisUtils.set(Long.toString(uid)+"ASPCOOKIE",ASPCookie);
+                        logger.debug("获取教务处Cookie成功");
                         return;
                     }
                 }
@@ -123,7 +135,8 @@ public class JWCUtil {
                 viewState = viewState.substring(viewState.indexOf("value")+7,viewState.lastIndexOf("\""));
                 // 保存当前viewState至redis数据库中
                 redisUtils.set(Long.toString(uid)+"VIEWSTATE",viewState);
-                System.out.println(viewState);
+                logger.debug("获取教务处信息成功");
+                return;
 //                String pcInfo = body.substring(body.indexOf("Mozilla"));
 //                pcInfo = pcInfo.substring(0,pcInfo.indexOf("\""));
 //                System.out.println(pcInfo);
@@ -140,10 +153,6 @@ public class JWCUtil {
      * @return void
      **/
     public static void getValidateCode(long uid){
-        System.setProperty("http.proxyHost", "localhost");
-        System.setProperty("http.proxyPort", "8888");
-        System.setProperty("https.proxyHost", "localhost");
-        System.setProperty("https.proxyPort", "8888");
         HttpHeaders headers = new HttpHeaders();
         headers.set("User-Agent","Mozilla/5.0 (Windows NT 6.3; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/70.0.3538.102 Safari/537.36");
         // 判断redis中是否存着对应的Cookie
@@ -158,19 +167,24 @@ public class JWCUtil {
         map.put("sid",redisUtils.get("SID"));
         ResponseEntity<Resource> responseEntity = restTemplate.exchange(VPNAPI.PROXY+JWCAPI.CODE,HttpMethod.GET,request,Resource.class,map);
         InputStream in = null;
-        FileOutputStream fileOutputStream = null;
         if(responseEntity.getStatusCode().is2xxSuccessful()){
             try {
                 in = responseEntity.getBody().getInputStream();
-                byte[] data = new byte[1024];
-                int len = 0;
-                fileOutputStream = new FileOutputStream("F:\\code\\code1.jpg");
-                while ((len = in.read(data)) != -1){
-                    fileOutputStream.write(data,0,len);
-                }
+                OSSClient oss = OSSClientUtil.getOSSClient();
+                OSSClientUtil.uploadObject2OSS(oss,in,"code"+uid+".jpeg",bucketName,folder);
+                logger.debug("获取验证码并上传至OSS成功");
+                return;
+//                byte[] data = new byte[1024];
+//                int len = 0;
+//                fileOutputStream = new FileOutputStream("F:\\code\\code1.jpg");
+//                while ((len = in.read(data)) != -1){
+//                    fileOutputStream.write(data,0,len);
+//                }
             } catch (IOException e) {
                 e.printStackTrace();
-            } finally {
+            }catch (WSExcetpion s){
+                s.getMsg();
+            }finally {
                 if(null != in){
                     try {
                         in.close();
@@ -178,16 +192,10 @@ public class JWCUtil {
                         e.printStackTrace();
                     }
                 }
-                if(null != fileOutputStream){
-                    try {
-                        fileOutputStream.close();
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
-                }
             }
+
         }
-        return ;
+        throw new WSExcetpion("获取验证码失败");
     }
     @Autowired(required = true)
     public void setRestTemplate(RestTemplate restTemplate){
@@ -197,5 +205,15 @@ public class JWCUtil {
     @Autowired(required = true)
     private void setRedisUtils(RedisUtils redisUtils){
         this.redisUtils = redisUtils;
+    }
+
+    @Value("${aliyun.oss.bucketName}")
+    public void setBucketName(String bucketName) {
+        this.bucketName = bucketName;
+    }
+
+    @Value("${aliyun.oss.codefolder}")
+    public void setFolder(String folder) {
+        this.folder = folder+"/";
     }
 }
