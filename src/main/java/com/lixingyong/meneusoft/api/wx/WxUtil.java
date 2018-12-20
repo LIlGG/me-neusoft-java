@@ -36,7 +36,7 @@ public class WxUtil {
      * @Param []
      * @return void
      **/
-    public static Map code2Session(String jsCode) throws NullPointerException{
+    public static Map code2Session(String jsCode) throws WSExcetpion{
         Map<String,Object> params = new HashMap<>();
         params.put("app_id",APP_ID);
         params.put("secret",APP_SECRET);
@@ -49,7 +49,7 @@ public class WxUtil {
                 return result;
             }
         }
-        return null;
+        throw new WSExcetpion("获取用户登录态信息失败");
     }
     
     /**

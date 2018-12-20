@@ -11,7 +11,7 @@ import java.util.List;
 
 /**
  * @ClassName NoticesController
- * @Description TODO
+ * @Description TODO 通知或者公告控制层
  * @Author lixingyong
  * @Date 2018/12/11 11:26
  * @Version 1.0

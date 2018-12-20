@@ -49,6 +49,25 @@ public class JwtUtils {
     }
 
     /**
+     * 生成jwt token
+     */
+    public String generateToken(int userId) {
+        Date nowDate = new Date();
+        //过期时间
+        Date expireDate = new Date(nowDate.getTime() + expire * 1000);
+        Map<String,Object> claims = new HashMap<>();
+        claims.put("user_id",userId);
+        return Jwts.builder()
+                .setClaims(claims)
+                .setHeaderParam("typ", "JWT")
+                .setSubject(userId+"")
+                .setIssuedAt(nowDate)
+                .setExpiration(expireDate)
+                .signWith(SignatureAlgorithm.HS512, secret)
+                .compact();
+    }
+
+    /**
      * @Author lixingyong
      * @Description //TODO 根据Token获取信息
      * @Date 2018/11/5
