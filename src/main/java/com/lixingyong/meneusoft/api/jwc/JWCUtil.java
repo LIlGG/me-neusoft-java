@@ -97,7 +97,7 @@ public class JWCUtil {
                         String ASPCookie = cookies[0];
                         //将获取到的数据存入redis数据库中并返回
                         redisUtils.set(Long.toString(uid)+"ASPCOOKIE",ASPCookie);
-                        logger.debug("获取教务处Cookie成功");
+                        logger.info("获取教务处Cookie成功");
                         return;
                     }
                 }
@@ -135,7 +135,7 @@ public class JWCUtil {
                 viewState = viewState.substring(viewState.indexOf("value")+7,viewState.lastIndexOf("\""));
                 // 保存当前viewState至redis数据库中
                 redisUtils.set(Long.toString(uid)+"VIEWSTATE",viewState);
-                logger.debug("获取教务处信息成功");
+                logger.info("获取教务处信息成功");
                 return;
 //                String pcInfo = body.substring(body.indexOf("Mozilla"));
 //                pcInfo = pcInfo.substring(0,pcInfo.indexOf("\""));
@@ -172,14 +172,8 @@ public class JWCUtil {
                 in = responseEntity.getBody().getInputStream();
                 OSSClient oss = OSSClientUtil.getOSSClient();
                 OSSClientUtil.uploadObject2OSS(oss,in,"code"+uid+".jpeg",bucketName,folder);
-                logger.debug("获取验证码并上传至OSS成功");
+                logger.info("获取验证码并上传至OSS成功");
                 return;
-//                byte[] data = new byte[1024];
-//                int len = 0;
-//                fileOutputStream = new FileOutputStream("F:\\code\\code1.jpg");
-//                while ((len = in.read(data)) != -1){
-//                    fileOutputStream.write(data,0,len);
-//                }
             } catch (IOException e) {
                 e.printStackTrace();
             }catch (WSExcetpion s){

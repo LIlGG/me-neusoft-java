@@ -27,9 +27,6 @@ public class AuthorizationInterceptor extends HandlerInterceptorAdapter {
     private JwtUtils jwtUtils;
 
     public static final String USER_KEY = "user_id";
-    public static final String SESSION_KEY = "session_key";
-    public static final String OPENID = "open_id";
-
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
         Token annotation;
@@ -38,7 +35,7 @@ public class AuthorizationInterceptor extends HandlerInterceptorAdapter {
         }else{
             return true;
         }
-        System.out.println(annotation);
+
         if(annotation == null){
             return true;
         }
@@ -54,13 +51,16 @@ public class AuthorizationInterceptor extends HandlerInterceptorAdapter {
             throw new WSExcetpion(jwtUtils.getHeader() + "不能为空", HttpStatus.UNAUTHORIZED.value());
         }
 
+        //凭证不是Bearer开头的
+        if(!StringUtils.startsWith(token,"Bearer")){
+            throw new WSExcetpion(jwtUtils.getHeader() +"不正确", HttpStatus.UNAUTHORIZED.value());
+        }
+
+        token = StringUtils.substring(token,token.indexOf(" ")+1);
         Claims claims = jwtUtils.getClaimByToken(token);
         if(claims == null || jwtUtils.isTokenExpired(claims.getExpiration())){
             throw new WSExcetpion(jwtUtils.getHeader() + "失效，请重新登录", HttpStatus.UNAUTHORIZED.value());
         }
-//        System.out.println(claims.get("user_id"));
-//        System.out.println(claims.get("session_key"));
-//        System.out.println(claims.get("open_id"));
         //设置userId到request里，后续根据userId，获取用户信息
         request.setAttribute(USER_KEY, Long.parseLong(claims.get("user_id").toString()));
         return true;

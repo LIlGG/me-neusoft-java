@@ -33,4 +33,13 @@ public interface UserService extends IService<User> {
      * @return com.lixingyong.meneusoft.modules.xcx.vo.LoginVO
      **/
     LoginVO login(int userId);
+
+    /**
+     * @Author lixingyong
+     * @Description //TODO 绑定教务处，如果存在，则更新。如果不存在，则新增
+     * @Date 2019/2/9
+     * @Param [user_id, student_id, password]
+     * @return void
+     **/
+    void insertOrUpdateJwcAccount(String user_id, String student_id, String password, String code);
 }

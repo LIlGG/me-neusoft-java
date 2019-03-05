@@ -2,6 +2,7 @@ package com.lixingyong.meneusoft.modules.xcx.resovler;
 
 import com.lixingyong.meneusoft.common.interceptor.AuthorizationInterceptor;
 import com.lixingyong.meneusoft.modules.xcx.annotation.LoginUser;
+import com.lixingyong.meneusoft.modules.xcx.entity.User;
 import com.lixingyong.meneusoft.modules.xcx.entity.WxUser;
 import org.springframework.core.MethodParameter;
 import org.springframework.stereotype.Component;
@@ -19,27 +20,20 @@ import org.springframework.web.method.support.ModelAndViewContainer;
  */
 @Component
 public class LoginUserHandlerMethodArgumentResolver implements HandlerMethodArgumentResolver {
-//    @Autowired
-//    private UserService userService;
-
     @Override
     public boolean supportsParameter(MethodParameter parameter) {
-        return parameter.getParameterType().isAssignableFrom(WxUser.class) && parameter.hasParameterAnnotation(LoginUser.class);
+        return parameter.getParameterType().isAssignableFrom(String.class) && parameter.hasParameterAnnotation(LoginUser.class);
     }
 
     @Override
     public Object resolveArgument(MethodParameter parameter, ModelAndViewContainer container,
                                   NativeWebRequest request, WebDataBinderFactory factory) throws Exception {
         //获取用户ID
-        Object object = request.getAttribute(AuthorizationInterceptor.USER_KEY, RequestAttributes.SCOPE_REQUEST);
+        Object object = request.getAttribute(AuthorizationInterceptor.USER_KEY, RequestAttributes.SCOPE_REQUEST).toString();
         if(object == null){
             return null;
         }
 
-//        //获取用户信息
-//        WxUser user = userService.selectById((Long)object);
-//
-//        return user;
-        return true;
+        return object;
     }
 }

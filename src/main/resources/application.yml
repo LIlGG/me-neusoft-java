@@ -47,7 +47,7 @@ wx:
     # 你的secret密匙
     secret: gts0gm188mc096ad923453hrrsfsg8xb9[www.lixingyong.com]
     expire: 604800
-    header: token
+    header: Authorization
   xcx:
     # 小程序ID和密匙
     appid: 

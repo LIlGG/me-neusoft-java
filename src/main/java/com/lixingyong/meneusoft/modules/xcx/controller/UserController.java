@@ -2,8 +2,11 @@ package com.lixingyong.meneusoft.modules.xcx.controller;
 
 import com.lixingyong.meneusoft.api.wx.WxUtil;
 import com.lixingyong.meneusoft.common.exception.WSExcetpion;
+import com.lixingyong.meneusoft.common.interceptor.AuthorizationInterceptor;
 import com.lixingyong.meneusoft.common.utils.JwtUtils;
 import com.lixingyong.meneusoft.common.utils.R;
+import com.lixingyong.meneusoft.modules.xcx.annotation.LoginUser;
+import com.lixingyong.meneusoft.modules.xcx.annotation.Token;
 import com.lixingyong.meneusoft.modules.xcx.entity.User;
 import com.lixingyong.meneusoft.modules.xcx.entity.Wechat;
 import com.lixingyong.meneusoft.modules.xcx.service.UserService;
@@ -13,9 +16,11 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
+import lombok.extern.java.Log;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.HttpServletRequest;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -41,7 +46,6 @@ public class UserController {
         Map<String,Object> userInfo = null;
         Wechat wechat = new Wechat() ;
         int userId;
-        System.out.println("获取到的code"+code);
         try {
             userInfo = WxUtil.code2Session(code);
             wechat = wechatService.getWechat((String)userInfo.get("openid"));
@@ -66,19 +70,28 @@ public class UserController {
 
     @ApiOperation("绑定统一认证中心")
     @PostMapping("/bind")
-    public R bind(){
+    public R bind(@RequestParam String student_id, @RequestParam String password){
         return null;
     }
 
+    @Token
     @ApiOperation("绑定教务处")
     @PostMapping("/jwc/bind")
-    public R jwcBind(){
-        return null;
+    public R jwcBind(@RequestParam String studentId, @RequestParam String password,@RequestParam String code, @LoginUser String userId){
+        try {
+            // 更新或新增当前用户的教务处账号和密码
+            userService.insertOrUpdateJwcAccount(userId,studentId, password, code);
+        } catch (NullPointerException e){
+            return R.error("当前用户不存在或账号密码为空");
+        } catch (WSExcetpion e){
+            return R.error(e.getMsg());
+        }
+        return R.ok("绑定教务处成功");
     }
 
     @ApiOperation("绑定图书馆")
     @PostMapping("/library/bind")
-    public R library(){
+    public R library(@RequestParam String student_id, @RequestParam String password){
         return null;
     }
 
