@@ -74,3 +74,5 @@ mybatis-plus:
     map-underscore-to-camel-case: true
     cache-enabled: false
     call-setters-on-nulls: true
+logging:
+  config: classpath:meneusoft-logback.xml

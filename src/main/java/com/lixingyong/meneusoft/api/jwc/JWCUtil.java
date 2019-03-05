@@ -47,28 +47,6 @@ public class JWCUtil {
 
     private static Logger logger = LoggerFactory.getLogger(JWCUtil.class);
 
-    public static boolean exeJWCLogin(long uid){
-        System.setProperty("http.proxyHost", "localhost");
-        System.setProperty("http.proxyPort", "8888");
-        System.setProperty("https.proxyHost", "localhost");
-        System.setProperty("https.proxyPort", "8888");
-        // 登录VPN
-        if(!VPNUtil.exeVpnLogin()){
-            return false;
-        }
-        logger.info("用户"+uid+"执行登录教务处流程");
-        try {
-            getJWCCookie(uid);
-            getJWCInfo(uid);
-            getValidateCode(uid);
-            logger.info("登录教务处流程执行完成");
-            return true;
-        }catch (WSExcetpion s){
-            logger.error("用户"+uid+"登录教务网失败，错误信息："+s.getMsg());
-        }
-        return false;
-    }
-
     /**
      * @Author lixingyong
      * @Description //TODO 获取教务处的Cookie，当前Cookie针对与每个账号而言
@@ -152,12 +130,12 @@ public class JWCUtil {
      * @Param [uid]
      * @return void
      **/
-    public static void getValidateCode(long uid){
+    public static String getValidateCode(long uid) throws WSExcetpion{
         HttpHeaders headers = new HttpHeaders();
         headers.set("User-Agent","Mozilla/5.0 (Windows NT 6.3; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/70.0.3538.102 Safari/537.36");
         // 判断redis中是否存着对应的Cookie
         if(!redisUtils.hasKey("SVPNCOOKIE") || !redisUtils.hasKey(Long.toString(uid)+"ASPCOOKIE") || !redisUtils.hasKey("SID")){
-            return ;
+            return null;
         }
         List<String> cookiesList = new ArrayList<>();
         cookiesList.add(redisUtils.get("SVPNCOOKIE"));
@@ -171,9 +149,10 @@ public class JWCUtil {
             try {
                 in = responseEntity.getBody().getInputStream();
                 OSSClient oss = OSSClientUtil.getOSSClient();
-                OSSClientUtil.uploadObject2OSS(oss,in,"code"+uid+".jpeg",bucketName,folder);
+                String key = OSSClientUtil.uploadObject2OSS(oss,in,"code"+uid+".jpeg",bucketName,folder);
                 logger.info("获取验证码并上传至OSS成功");
-                return;
+                String url = OSSClientUtil.getUrl("code"+uid+".jpeg");
+                return url;
             } catch (IOException e) {
                 e.printStackTrace();
             }catch (WSExcetpion s){
@@ -187,9 +166,8 @@ public class JWCUtil {
                     }
                 }
             }
-
         }
-        throw new WSExcetpion("获取验证码失败");
+        return null;
     }
     @Autowired(required = true)
     public void setRestTemplate(RestTemplate restTemplate){

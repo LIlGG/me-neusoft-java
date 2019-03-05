@@ -1,12 +1,15 @@
 package com.lixingyong.meneusoft.modules.xcx.controller;
 
+import com.lixingyong.meneusoft.api.Bind.Type;
 import com.lixingyong.meneusoft.api.jwc.JWCUtil;
 import com.lixingyong.meneusoft.api.vpn.VPNUtil;
 import com.lixingyong.meneusoft.api.wx.WxUtil;
+import com.lixingyong.meneusoft.common.exception.WSExcetpion;
 import com.lixingyong.meneusoft.common.utils.*;
 import com.lixingyong.meneusoft.modules.xcx.annotation.Token;
 import com.lixingyong.meneusoft.modules.xcx.entity.WxUser;
 import com.lixingyong.meneusoft.modules.xcx.service.WxUserService;
+import com.lixingyong.meneusoft.modules.xcx.utils.LoginUtil;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -82,7 +85,7 @@ public class WxSafetyController {
 
     @GetMapping(value = "/getVPN")
     public void vpn(){
-        if(VPNUtil.exeVpnLogin()){
+        if(LoginUtil.exeVpnLogin()){
             JWCUtil.getJWCCookie(1);
         }
 
@@ -90,29 +93,7 @@ public class WxSafetyController {
 
     @GetMapping(value = "/getJWC")
     public void jwc(){
-        JWCUtil.exeJWCLogin(1);
-    }
-
-    /**
-     * @Author lixingyong
-     * @Description //TODO 获取验证码
-     * @Date 2018/12/18
-     * @Param []
-     * @return void
-     **/
-    @GetMapping(value = "/getValidateCode")
-    public void getValidateCode(){
-        JWCUtil.getValidateCode(1);
-//        //抓取图片
-//        Timer timer=new Timer();//实例化Timer类
-//        TimerTask task = new TimerTask() {
-//            @Override
-//            public void run() {
-//
-//            }
-//        };
-//        timer.schedule(task,2 * 1000,2*1000);
-
+        LoginUtil.exeJWCLogin(1);
     }
 
     @GetMapping(value = "/logout")

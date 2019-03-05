@@ -31,48 +31,10 @@ import java.util.List;
  */
 @Component
 public class  VPNUtil {
-    private static String[] userName;
-    private static String[] password;
+
     private static RestTemplate restTemplate;
     private static RedisUtils redisUtils;
     private static Logger logger = LoggerFactory.getLogger(VPNUtil.class);
-
-
-    public static boolean exeVpnLogin(){
-        System.setProperty("http.proxyHost", "localhost");
-        System.setProperty("http.proxyPort", "8888");
-        System.setProperty("https.proxyHost", "localhost");
-        System.setProperty("https.proxyPort", "8888");
-        if(isLogin()){
-           return true;
-        }
-        logger.info("VPN未登录，执行登录流程");
-        if(userName.length < 1 || null == userName){
-            throw new WSExcetpion("服务器数据错误，请联系管理员!");
-        }
-        if(password.length < 1 || null == password){
-            throw new WSExcetpion("服务器数据错误，请联系管理员!");
-        }
-        if(password.length != userName.length){
-            throw new WSExcetpion("服务器数据错误，请联系管理员!");
-        }
-        for(int i = 0; i < userName.length; i++){
-            synchronized (VPNUtil.class){
-                logger.info("使用账号："+userName[i] + "进行登录");
-                try {
-                    String redir = loginCheck(userName[i], password[i]);
-                    getSVpnCookie(redir);
-                    getSessionId();
-                    logger.info("登录VPN成功");
-                    return true;
-                }catch (WSExcetpion s) {
-                    logger.error("账号"+userName[i] + "登录失败，准备尝试其它账号,错误信息："+s.getMsg());
-                }
-            }
-        }
-        logger.error("登录VPN失败，请稍候再试");
-        return false;
-    }
 
     /**
      * @Author lixingyong
@@ -82,7 +44,7 @@ public class  VPNUtil {
      * @return boolean
      **/
     public static boolean isLogin(){
-        logger.info("检测VPN登录状态");
+        logger.debug("检测VPN登录状态");
         //获取Header
         HttpHeaders headers = new HttpHeaders();
         //判断是否存在SVPNSESSION
@@ -98,7 +60,7 @@ public class  VPNUtil {
         if(responseEntity.getStatusCode().is2xxSuccessful()){
             if(null != responseEntity.getBody()){
                 if(responseEntity.getBody().contains("success")) {
-                    logger.info("VPN已登录");
+                    logger.debug("VPN已登录");
                     return true;
                 }
             }
@@ -113,7 +75,7 @@ public class  VPNUtil {
      * @Param []
      * @return java.lang.String
      **/
-    private static String loginCheck(String un,String pw) throws WSExcetpion {
+    public static String loginCheck(String un,String pw) throws WSExcetpion {
         //获取Header
         HttpHeaders headers = new HttpHeaders();
         //设置类型
@@ -143,7 +105,7 @@ public class  VPNUtil {
      * @Param [url]
      * @return boolean //TODO 获取成功返回true，否则返回false
      **/
-    private static void getSVpnCookie(String url) throws WSExcetpion {
+    public static void getSVpnCookie(String url) throws WSExcetpion {
         //获取Header
         HttpHeaders headers = new HttpHeaders();
         //设置类型
@@ -175,7 +137,7 @@ public class  VPNUtil {
      * @Param []
      * @return boolean
      **/
-    private static void getSessionId() throws WSExcetpion {
+    public static void getSessionId() throws WSExcetpion {
         //获取Header
         HttpHeaders headers = new HttpHeaders();
         //设置类型
@@ -232,17 +194,6 @@ public class  VPNUtil {
             return true;
         }
         return false;
-    }
-    
-
-    @Value("${neusoft.username}")
-    private void setUserName(String username){
-        this.userName = username.split("&");
-    }
-
-    @Value("${neusoft.password}")
-    private void setPassword(String password){
-        this.password = password.split("&");
     }
 
     @Autowired(required = true)
