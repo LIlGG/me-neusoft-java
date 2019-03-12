@@ -5,6 +5,7 @@ import com.aliyun.oss.model.Bucket;
 import com.aliyun.oss.model.OSSObject;
 import com.aliyun.oss.model.ObjectMetadata;
 import com.aliyun.oss.model.PutObjectResult;
+import com.lixingyong.meneusoft.common.exception.WSExcetpion;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -14,6 +15,8 @@ import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStream;
+import java.net.URL;
+import java.util.Date;
 
 /**
  * @ClassName OSSClientUtil
@@ -218,6 +221,28 @@ public class OSSClientUtil {
         }
         // 默认返回类型
         return "";
+    }
+
+    /**
+     * 获得url链接
+     *
+     * @param fileCode
+     * @return
+     */
+    public static String getUrl(String fileCode) throws WSExcetpion {
+        String key = folder +"/"+fileCode;
+        // 设置URL过期时间为10年  3600l* 1000*24*365*10
+        Date expiration = new Date(new Date().getTime() + 3600l * 1000 * 24 * 365 * 10);
+        // 生成URL
+        try{
+            URL url = getOSSClient().generatePresignedUrl(bucketName, key, expiration);
+            if (url != null) {
+                return url.toString();
+            }
+        }catch (WSExcetpion e){
+           throw new WSExcetpion(e.getMsg());
+        }
+        return null;
     }
 
     @Value("${aliyun.accessKeyId}")

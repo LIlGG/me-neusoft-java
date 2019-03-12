@@ -77,10 +77,10 @@ public class UserController {
     @Token
     @ApiOperation("绑定教务处")
     @PostMapping("/jwc/bind")
-    public R jwcBind(@RequestParam String studentId, @RequestParam String password,@RequestParam String code, @LoginUser String userId){
+    public R jwcBind(@RequestParam String student_id, @RequestParam String password,@RequestParam String vcode, @LoginUser String userId){
         try {
             // 更新或新增当前用户的教务处账号和密码
-            userService.insertOrUpdateJwcAccount(userId,studentId, password, code);
+            userService.insertOrUpdateJwcAccount(userId,student_id, password, vcode);
         } catch (NullPointerException e){
             return R.error("当前用户不存在或账号密码为空");
         } catch (WSExcetpion e){

@@ -1,6 +1,6 @@
 package com.lixingyong.meneusoft.modules.xcx.utils;
 
-import com.lixingyong.meneusoft.api.Bind.Type;
+import com.lixingyong.meneusoft.api.bind.Type;
 
 /**
  * @ClassName com.lixingyong.meneusoft.modules.xcx.utils
@@ -18,6 +18,17 @@ public class BindUtil {
      * @return boolean
      **/
     public static boolean accountStatus(String account, String pw, String vCode, Type type){
+        // 执行登录程序
+        switch (type){
+            case JWC:
+                // 执行教务处登录程序
+                System.out.println(account+ pw+ vCode);
+                break;
+            case Bind:
+                break;
+            case LIBRARY:
+                break;
+        }
         return false;
     }
 }

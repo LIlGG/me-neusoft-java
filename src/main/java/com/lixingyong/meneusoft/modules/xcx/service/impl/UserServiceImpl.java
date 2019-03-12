@@ -1,22 +1,17 @@
 package com.lixingyong.meneusoft.modules.xcx.service.impl;
 
 import com.baomidou.mybatisplus.service.impl.ServiceImpl;
-import com.lixingyong.meneusoft.api.Bind.Type;
-import com.lixingyong.meneusoft.common.exception.WSExcetpion;
+import com.lixingyong.meneusoft.api.bind.Type;
 import com.lixingyong.meneusoft.common.utils.JwtUtils;
-import com.lixingyong.meneusoft.modules.xcx.annotation.LoginUser;
 import com.lixingyong.meneusoft.modules.xcx.dao.UserDao;
 import com.lixingyong.meneusoft.modules.xcx.entity.User;
 import com.lixingyong.meneusoft.modules.xcx.entity.UserConfig;
-import com.lixingyong.meneusoft.modules.xcx.entity.UserLibrary;
-import com.lixingyong.meneusoft.modules.xcx.entity.Wechat;
 import com.lixingyong.meneusoft.modules.xcx.service.UserConfigService;
 import com.lixingyong.meneusoft.modules.xcx.service.UserLibraryService;
 import com.lixingyong.meneusoft.modules.xcx.service.UserService;
 import com.lixingyong.meneusoft.modules.xcx.service.WechatService;
 import com.lixingyong.meneusoft.modules.xcx.utils.BindUtil;
 import com.lixingyong.meneusoft.modules.xcx.vo.LoginVO;
-import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 

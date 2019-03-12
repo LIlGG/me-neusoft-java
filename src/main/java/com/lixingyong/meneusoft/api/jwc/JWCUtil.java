@@ -1,11 +1,9 @@
 package com.lixingyong.meneusoft.api.jwc;
 
 import com.aliyun.oss.OSSClient;
-import com.aliyun.oss.internal.OSSUtils;
-import com.lixingyong.meneusoft.api.jwc.JWCAPI;
 import com.lixingyong.meneusoft.api.vpn.VPNAPI;
-import com.lixingyong.meneusoft.api.vpn.VPNUtil;
 import com.lixingyong.meneusoft.common.exception.WSExcetpion;
+import com.lixingyong.meneusoft.common.utils.MD5Utils;
 import com.lixingyong.meneusoft.common.utils.OSSClientUtil;
 import com.lixingyong.meneusoft.common.utils.RedisUtils;
 import org.slf4j.Logger;
@@ -18,11 +16,12 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
-
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -44,6 +43,10 @@ public class JWCUtil {
     private static String bucketName;
     /** 阿里云API的文件夹名称 */
     private static String folder;
+    /** 阿里云API的文件前缀 */
+    private static String codeFolder;
+    /** 阿里云API的文件后缀 */
+    private static String suffix;
 
     private static Logger logger = LoggerFactory.getLogger(JWCUtil.class);
 
@@ -115,9 +118,6 @@ public class JWCUtil {
                 redisUtils.set(Long.toString(uid)+"VIEWSTATE",viewState);
                 logger.info("获取教务处信息成功");
                 return;
-//                String pcInfo = body.substring(body.indexOf("Mozilla"));
-//                pcInfo = pcInfo.substring(0,pcInfo.indexOf("\""));
-//                System.out.println(pcInfo);
             }
         }
         throw new WSExcetpion("获取教务处登录信息失败");
@@ -125,7 +125,7 @@ public class JWCUtil {
     
     /**
      * @Author lixingyong
-     * @Description //TODO 获取验证码（未完善）
+     * @Description //TODO 获取验证码
      * @Date 2018/12/7
      * @Param [uid]
      * @return void
@@ -149,9 +149,9 @@ public class JWCUtil {
             try {
                 in = responseEntity.getBody().getInputStream();
                 OSSClient oss = OSSClientUtil.getOSSClient();
-                String key = OSSClientUtil.uploadObject2OSS(oss,in,"code"+uid+".jpeg",bucketName,folder);
+                String key = OSSClientUtil.uploadObject2OSS(oss,in,codeFolder+uid+suffix,bucketName,folder);
                 logger.info("获取验证码并上传至OSS成功");
-                String url = OSSClientUtil.getUrl("code"+uid+".jpeg");
+                String url = OSSClientUtil.getUrl(codeFolder+uid+suffix);
                 return url;
             } catch (IOException e) {
                 e.printStackTrace();
@@ -169,6 +169,48 @@ public class JWCUtil {
         }
         return null;
     }
+
+    /**
+     * @Author lixingyong
+     * @Description //TODO 执行教务处登录流程
+     * @Date 2019/3/7
+     * @Param [uid, account, pw, vCode]
+     * @return void
+     **/
+    public static void jwcStudentLogin(long uid, String account, String pw, String vCode) throws WSExcetpion{
+
+    }
+
+    /**
+     * @Author lixingyong
+     * @Description //TODO 教务处登录流程执行前进行账号加密措施
+     * @Date 2019/3/7
+     * @Param [viewState, pcInfo, typeName, account, pw, vCode]
+     * @return java.lang.String
+     **/
+    private static MultiValueMap<String, String> studentLoginEncryption(String viewState, String pcInfo, String typeName, String account, String pw, String vCode){
+        MultiValueMap<String,String> param = new LinkedMultiValueMap<>();//参数放入一个map中，restTemplate不能用hashMap
+        param.add("__VIEWSTATE",URLEncoder.encode(viewState));
+        param.add("pcInfo",URLEncoder.encode(pcInfo));
+        param.add("typeName","%D1%A7%C9%FA");
+        param.add("dsdsdsdsdxcxdfgfg",chkPwd(account,pw));
+        param.add("fgfggfdgtyuuyyuuckjg",chkVCode(vCode));
+        param.add("Sel_Type","STU");
+        param.add("txt_asmcdefsddsd",account);
+        param.add("txt_pewerwedsdfsdff","");
+        param.add("txt_sdertfgsadscxcadsads","");
+        return param;
+    }
+
+    private static String chkPwd(String account, String pw) {
+        return MD5Utils.getMD5String(account + MD5Utils.getMD5String(pw).substring(0,30).toUpperCase()+"13631").substring(0,30).toUpperCase();
+    }
+
+    private static String chkVCode(String code){
+        return MD5Utils.getMD5String(MD5Utils.getMD5String(code.toUpperCase()).substring(0,30).toUpperCase()+"13631").substring(0,30).toUpperCase();
+    }
+
+
     @Autowired(required = true)
     public void setRestTemplate(RestTemplate restTemplate){
         this.restTemplate = restTemplate;
@@ -184,8 +226,18 @@ public class JWCUtil {
         this.bucketName = bucketName;
     }
 
-    @Value("${aliyun.oss.codefolder}")
+    @Value("${aliyun.oss.folder}")
     public void setFolder(String folder) {
         this.folder = folder+"/";
+    }
+
+    @Value("${aliyun.oss.codefolder}")
+    public void setCodeFolder(String codefolder) {
+        this.codeFolder = codefolder;
+    }
+
+    @Value("${aliyun.oss.suffix}")
+    public void setSuffix(String suffix) {
+        this.suffix = suffix;
     }
 }

@@ -1,6 +1,5 @@
 package com.lixingyong.meneusoft.modules.xcx.controller;
 
-import com.lixingyong.meneusoft.api.Bind.Type;
 import com.lixingyong.meneusoft.api.jwc.JWCUtil;
 import com.lixingyong.meneusoft.common.exception.WSExcetpion;
 import com.lixingyong.meneusoft.common.utils.R;
@@ -8,7 +7,6 @@ import com.lixingyong.meneusoft.modules.xcx.utils.LoginUtil;
 import io.swagger.annotations.Api;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 /**

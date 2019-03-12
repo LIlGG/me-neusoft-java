@@ -3788,7 +3788,7 @@ SwaggerClient.prototype.buildFromSpec = function (response) {
 
   // get paths, create functions for each operationId
 
-  // Bind help to 'client.apis'
+  // bind help to 'client.apis'
   self.apis.help = _.bind(self.help, self);
 
   _.forEach(response.paths, function (pathObj, path) {
@@ -3888,7 +3888,7 @@ SwaggerClient.prototype.buildFromSpec = function (response) {
 
         operationId = self.makeUniqueOperationId(operationId, self.apis[apiProperty]);
 
-        // Bind tag help
+        // bind tag help
         if (!_.isFunction(operationGroup.help)) {
           operationGroup.help = _.bind(self.help, operationGroup);
         }

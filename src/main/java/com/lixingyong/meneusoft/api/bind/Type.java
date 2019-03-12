@@ -1,4 +1,4 @@
-package com.lixingyong.meneusoft.api.Bind;
+package com.lixingyong.meneusoft.api.bind;
 
 public enum Type {
     JWC("jwc"), LIBRARY("library"),Bind("bind");
