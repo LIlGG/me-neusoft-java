@@ -76,7 +76,12 @@ public class UserServiceImpl extends ServiceImpl<UserDao, User> implements UserS
     public void insertOrUpdateJwcAccount(String user_id, String student_id, String password, String code) {
         // 判断当前教务处账号是否可用
         BindUtil.accountStatus(student_id, password, code, Type.JWC);
-        System.out.println(user_id);
+    }
+
+    @Override
+    public void insertOrUpdateLibraryAccount(String userId, String student_id, String password) {
+        // 判断图书馆账号是否可以使用
+        BindUtil.accountStatus(student_id, password,null,Type.LIBRARY);
     }
 
 }

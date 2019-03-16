@@ -19,4 +19,7 @@ public final class JWCAPI {
 
     /** 登录接口 */
     public final static String LOGIN = JWCSID + "_data/home_login.aspx";
+
+    /** 教务处学业基本信息快查 */
+    public final static String XYJZQK = JWCSID + "xsxj/Stu_xyjzqk_rpt.aspx";
 }

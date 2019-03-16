@@ -1,6 +1,8 @@
 package com.lixingyong.meneusoft.modules.xcx.utils;
 
 import com.lixingyong.meneusoft.api.bind.Type;
+import com.lixingyong.meneusoft.api.jwc.JWCUtil;
+import com.lixingyong.meneusoft.api.library.LibraryUtil;
 
 /**
  * @ClassName com.lixingyong.meneusoft.modules.xcx.utils
@@ -19,15 +21,20 @@ public class BindUtil {
      **/
     public static boolean accountStatus(String account, String pw, String vCode, Type type){
         // 执行登录程序
+        // 判断VPN是否已登录
+        if(!LoginUtil.exeVpnLogin()){
+            return false;
+        }
         switch (type){
             case JWC:
                 // 执行教务处登录程序
-                System.out.println(account+ pw+ vCode);
-                break;
+                JWCUtil.jwcStudentLogin(1, account, pw, vCode);
+                return true;
             case Bind:
                 break;
             case LIBRARY:
-                break;
+                LibraryUtil.libraryLogin(1,account,pw);
+                return true;
         }
         return false;
     }

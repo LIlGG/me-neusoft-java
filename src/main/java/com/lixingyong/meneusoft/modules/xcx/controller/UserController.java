@@ -1,5 +1,6 @@
 package com.lixingyong.meneusoft.modules.xcx.controller;
 
+import com.lixingyong.meneusoft.api.jwc.JWCUtil;
 import com.lixingyong.meneusoft.api.wx.WxUtil;
 import com.lixingyong.meneusoft.common.exception.WSExcetpion;
 import com.lixingyong.meneusoft.common.interceptor.AuthorizationInterceptor;
@@ -81,6 +82,7 @@ public class UserController {
         try {
             // 更新或新增当前用户的教务处账号和密码
             userService.insertOrUpdateJwcAccount(userId,student_id, password, vcode);
+            JWCUtil.stuXyjzqk(1);
         } catch (NullPointerException e){
             return R.error("当前用户不存在或账号密码为空");
         } catch (WSExcetpion e){
@@ -89,10 +91,19 @@ public class UserController {
         return R.ok("绑定教务处成功");
     }
 
+    @Token
     @ApiOperation("绑定图书馆")
     @PostMapping("/library/bind")
-    public R library(@RequestParam String student_id, @RequestParam String password){
-        return null;
+    public R library(@RequestParam String student_id, @RequestParam String password, @LoginUser String userId){
+        // 更新或新增当前用户的图书馆账号和密码
+        try {
+            userService.insertOrUpdateLibraryAccount(userId,student_id,password);
+        }catch (NullPointerException e){
+            return R.error("当前用户不存在或账号密码为空");
+        }catch (WSExcetpion e){
+            return R.error(e.getMsg());
+        }
+        return R.ok("绑定图书馆成功");
     }
 
     @ApiOperation("获取当前用户反馈列表")

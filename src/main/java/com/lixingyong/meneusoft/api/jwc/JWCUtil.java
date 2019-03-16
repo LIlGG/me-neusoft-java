@@ -131,6 +131,10 @@ public class JWCUtil {
      * @return void
      **/
     public static String getValidateCode(long uid) throws WSExcetpion{
+        System.setProperty("http.proxyHost", "localhost");
+        System.setProperty("http.proxyPort", "9999");
+        System.setProperty("https.proxyHost", "localhost");
+        System.setProperty("https.proxyPort", "9999");
         HttpHeaders headers = new HttpHeaders();
         headers.set("User-Agent","Mozilla/5.0 (Windows NT 6.3; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/70.0.3538.102 Safari/537.36");
         // 判断redis中是否存着对应的Cookie
@@ -178,6 +182,38 @@ public class JWCUtil {
      * @return void
      **/
     public static void jwcStudentLogin(long uid, String account, String pw, String vCode) throws WSExcetpion{
+        System.setProperty("http.proxyHost", "localhost");
+        System.setProperty("http.proxyPort", "9999");
+        System.setProperty("https.proxyHost", "localhost");
+        System.setProperty("https.proxyPort", "9999");
+        HttpHeaders headers = new HttpHeaders();
+        headers.set("User-Agent","Mozilla/5.0 (Windows NT 6.3; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/70.0.3538.102 Safari/537.36");
+        // 判断redis中是否存着对应的Cookie
+        if(!redisUtils.hasKey("SVPNCOOKIE") || !redisUtils.hasKey(Long.toString(uid)+"ASPCOOKIE") || !redisUtils.hasKey("SID") || !redisUtils.hasKey(Long.toString(uid)+"VIEWSTATE")){
+            throw new WSExcetpion("redis中数据不完善");
+        }
+        headers.set("Content-Type","application/x-www-form-urlencoded;charset=gb2312");
+        headers.set("Accept","text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8");
+        headers.set("Accept-Encoding","gzip, deflate, br");
+        headers.set("Accept-Language", "zh-CN,zh;q=0.8");
+
+        List<String> cookiesList = new ArrayList<>();
+        cookiesList.add(redisUtils.get("SVPNCOOKIE"));
+        cookiesList.add(" name=value");
+        cookiesList.add(redisUtils.get(Long.toString(uid)+"ASPCOOKIE"));
+        headers.put(HttpHeaders.COOKIE,cookiesList); //将Cookies放入Header
+
+        // 获取参数
+        String viewState = redisUtils.get(Long.toString(uid)+"VIEWSTATE");
+        String pcInfo = "";
+        MultiValueMap<String,String> param = studentLoginEncryption(viewState, pcInfo, "学生", account, pw, vCode);
+        HttpEntity<MultiValueMap<String,String>> request = new HttpEntity<>(param,headers);//将参数和header组成一个请求
+        map.put("sid",redisUtils.get("SID"));
+        ResponseEntity<Resource> responseEntity = restTemplate.exchange(VPNAPI.PROXY+JWCAPI.LOGIN,HttpMethod.POST,request,Resource.class,map);
+        if(responseEntity.getStatusCode().is2xxSuccessful()){
+            return;
+        }
+        throw new WSExcetpion("获取教务处登录信息失败");
 
     }
 
@@ -190,9 +226,9 @@ public class JWCUtil {
      **/
     private static MultiValueMap<String, String> studentLoginEncryption(String viewState, String pcInfo, String typeName, String account, String pw, String vCode){
         MultiValueMap<String,String> param = new LinkedMultiValueMap<>();//参数放入一个map中，restTemplate不能用hashMap
-        param.add("__VIEWSTATE",URLEncoder.encode(viewState));
-        param.add("pcInfo",URLEncoder.encode(pcInfo));
-        param.add("typeName","%D1%A7%C9%FA");
+        param.add("__VIEWSTATE",viewState);
+        param.add("pcInfo",pcInfo);
+        param.add("typeName",typeName);
         param.add("dsdsdsdsdxcxdfgfg",chkPwd(account,pw));
         param.add("fgfggfdgtyuuyyuuckjg",chkVCode(vCode));
         param.add("Sel_Type","STU");
@@ -202,6 +238,32 @@ public class JWCUtil {
         return param;
     }
 
+
+    /** 教务处学生基本学分情况查询 */
+    public static void stuXyjzqk(long uid){
+        System.setProperty("http.proxyHost", "localhost");
+        System.setProperty("http.proxyPort", "9999");
+        System.setProperty("https.proxyHost", "localhost");
+        System.setProperty("https.proxyPort", "9999");
+        HttpHeaders headers = new HttpHeaders();
+        headers.set("User-Agent","Mozilla/5.0 (Windows NT 6.3; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/70.0.3538.102 Safari/537.36");
+        // 判断redis中是否存着对应的Cookie
+        if(!redisUtils.hasKey("SVPNCOOKIE") || !redisUtils.hasKey(Long.toString(uid)+"ASPCOOKIE") || !redisUtils.hasKey("SID") || !redisUtils.hasKey(Long.toString(uid)+"VIEWSTATE")){
+            throw new WSExcetpion("redis中数据不完善");
+        }
+        List<String> cookiesList = new ArrayList<>();
+        cookiesList.add(redisUtils.get("SVPNCOOKIE"));
+        cookiesList.add(redisUtils.get(Long.toString(uid)+"ASPCOOKIE"));
+        headers.put(HttpHeaders.COOKIE,cookiesList); //将Cookies放入Header
+
+        HttpEntity<MultiValueMap<String,String>> request = new HttpEntity<>(null,headers);//将参数和header组成一个请求
+        map.put("sid",redisUtils.get("SID"));
+        ResponseEntity<Resource> responseEntity = restTemplate.exchange(VPNAPI.PROXY+JWCAPI.XYJZQK,HttpMethod.GET,request,Resource.class,map);
+        if(responseEntity.getStatusCode().is2xxSuccessful()){
+            return;
+        }
+        throw new WSExcetpion("查询学分失败！");
+    }
     private static String chkPwd(String account, String pw) {
         return MD5Utils.getMD5String(account + MD5Utils.getMD5String(pw).substring(0,30).toUpperCase()+"13631").substring(0,30).toUpperCase();
     }
