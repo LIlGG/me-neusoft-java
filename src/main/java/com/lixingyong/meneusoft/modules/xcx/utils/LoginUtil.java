@@ -1,6 +1,7 @@
 package com.lixingyong.meneusoft.modules.xcx.utils;
 
 import com.lixingyong.meneusoft.api.jwc.JWCUtil;
+import com.lixingyong.meneusoft.api.library.LibraryUtil;
 import com.lixingyong.meneusoft.api.vpn.VPNUtil;
 import com.lixingyong.meneusoft.common.exception.WSExcetpion;
 import io.lettuce.core.dynamic.annotation.Command;
@@ -90,8 +91,6 @@ public class LoginUtil{
         }
         return false;
     }
-
-    // 连接至图书馆
 
     @Value("${neusoft.username}")
     private void setUserName(String username){

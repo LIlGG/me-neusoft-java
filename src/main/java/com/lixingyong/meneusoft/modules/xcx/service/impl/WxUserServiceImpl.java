@@ -49,7 +49,7 @@ public class WxUserServiceImpl extends ServiceImpl<WxUserDao, WxUser> implements
 
     @Override
     public boolean isUser(Long user_id) {
-        if(this.selectCount(new EntityWrapper<WxUser>().eq(user_id != null,"user_id",user_id))> 0){
+        if(baseMapper.selectCount(new EntityWrapper<WxUser>().eq(user_id != null,"user_id",user_id))> 0){
             return true;
         }
         return false;

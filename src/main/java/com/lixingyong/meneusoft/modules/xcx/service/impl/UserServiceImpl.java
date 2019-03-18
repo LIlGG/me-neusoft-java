@@ -2,6 +2,7 @@ package com.lixingyong.meneusoft.modules.xcx.service.impl;
 
 import com.baomidou.mybatisplus.service.impl.ServiceImpl;
 import com.lixingyong.meneusoft.api.bind.Type;
+import com.lixingyong.meneusoft.common.exception.WSExcetpion;
 import com.lixingyong.meneusoft.common.utils.JwtUtils;
 import com.lixingyong.meneusoft.modules.xcx.dao.UserDao;
 import com.lixingyong.meneusoft.modules.xcx.entity.User;
@@ -75,13 +76,16 @@ public class UserServiceImpl extends ServiceImpl<UserDao, User> implements UserS
     @Override
     public void insertOrUpdateJwcAccount(String user_id, String student_id, String password, String code) {
         // 判断当前教务处账号是否可用
-        BindUtil.accountStatus(student_id, password, code, Type.JWC);
-    }
-
-    @Override
-    public void insertOrUpdateLibraryAccount(String userId, String student_id, String password) {
-        // 判断图书馆账号是否可以使用
-        BindUtil.accountStatus(student_id, password,null,Type.LIBRARY);
+        boolean usable = BindUtil.accountStatus(user_id,student_id, password, code, Type.JWC);
+        if(usable){
+            User user = new User();
+            user.setId(Integer.valueOf(user_id));
+            user.setStudentId(student_id);
+            user.setJwcPassword(password);
+            user.setJwcVerify(1);
+            this.insertOrUpdate(user);
+        }
+        throw new WSExcetpion("教务处账号或密码不正确");
     }
 
 }

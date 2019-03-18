@@ -19,7 +19,7 @@ public class BindUtil {
      * @Param [account, pw, vCode]
      * @return boolean
      **/
-    public static boolean accountStatus(String account, String pw, String vCode, Type type){
+    public static boolean accountStatus(String user_id, String account, String pw, String vCode, Type type){
         // 执行登录程序
         // 判断VPN是否已登录
         if(!LoginUtil.exeVpnLogin()){
@@ -28,12 +28,12 @@ public class BindUtil {
         switch (type){
             case JWC:
                 // 执行教务处登录程序
-                JWCUtil.jwcStudentLogin(1, account, pw, vCode);
+                JWCUtil.jwcStudentLogin(Long.parseLong(user_id), account, pw, vCode);
                 return true;
             case Bind:
                 break;
             case LIBRARY:
-                LibraryUtil.libraryLogin(1,account,pw);
+                LibraryUtil.libraryLogin(Long.parseLong(user_id),account,pw);
                 return true;
         }
         return false;

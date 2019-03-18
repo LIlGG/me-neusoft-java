@@ -12,6 +12,10 @@ public final class LibraryAPI {
 
     /** 图书馆公共检索系统 */
     public static final String LIBRARYREADER = "http/reader.library.neusoft.edu.cn";
+
     /** 图书馆用户登录 */
     public static final String LIBRARYLOGIN = LIBRARYREADER + "/reader/login.jsp?str_kind=login";
+
+    /** 图书馆借阅历史查询*/
+    public static final String LIBRARYHISTORY = LIBRARYREADER+ "/reader/readerHistory.jsp";
 }

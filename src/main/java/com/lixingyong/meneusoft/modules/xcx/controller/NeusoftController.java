@@ -3,6 +3,8 @@ package com.lixingyong.meneusoft.modules.xcx.controller;
 import com.lixingyong.meneusoft.api.jwc.JWCUtil;
 import com.lixingyong.meneusoft.common.exception.WSExcetpion;
 import com.lixingyong.meneusoft.common.utils.R;
+import com.lixingyong.meneusoft.modules.xcx.annotation.LoginUser;
+import com.lixingyong.meneusoft.modules.xcx.annotation.Token;
 import com.lixingyong.meneusoft.modules.xcx.utils.LoginUtil;
 import io.swagger.annotations.Api;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -26,15 +28,16 @@ public class NeusoftController {
      * @Param []
      * @return void
      **/
+    @Token
     @GetMapping(value = "/getValidateCode/{type}")
-    public R getValidateCode(@PathVariable String type){
+    public R getValidateCode(@PathVariable String type, @LoginUser String user_id){
         String code = null;
         // 判断当前类型
         try{
             switch (type){
                 case "jwc":
-                    LoginUtil.exeJWCLogin(1);
-                    code = JWCUtil.getValidateCode(1);
+                    LoginUtil.exeJWCLogin(Long.parseLong(user_id));
+                    code = JWCUtil.getValidateCode(Long.parseLong(user_id));
                     break;
             }
         }catch (WSExcetpion w){

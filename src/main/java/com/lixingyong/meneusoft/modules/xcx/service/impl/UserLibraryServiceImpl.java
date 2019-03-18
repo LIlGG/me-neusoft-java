@@ -2,12 +2,17 @@ package com.lixingyong.meneusoft.modules.xcx.service.impl;
 
 import com.baomidou.mybatisplus.mapper.EntityWrapper;
 import com.baomidou.mybatisplus.service.impl.ServiceImpl;
+import com.lixingyong.meneusoft.api.bind.Type;
+import com.lixingyong.meneusoft.common.exception.WSExcetpion;
 import com.lixingyong.meneusoft.modules.xcx.dao.UserLibraryDao;
 import com.lixingyong.meneusoft.modules.xcx.entity.UserLibrary;
 import com.lixingyong.meneusoft.modules.xcx.service.UserLibraryService;
+import com.lixingyong.meneusoft.modules.xcx.utils.BindUtil;
 import org.springframework.stereotype.Service;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * @ClassName NoticeServiceImpl
@@ -36,5 +41,37 @@ public class UserLibraryServiceImpl extends ServiceImpl<UserLibraryDao, UserLibr
             return userLibraries.get(0);
         }
         return null;
+    }
+
+    @Override
+    public void insertOrUpdateLibraryAccount(String userId, String student_id, String password) {
+        // 判断图书馆账号是否可以使用
+        boolean usable =  BindUtil.accountStatus(userId, student_id, password,null,Type.LIBRARY);
+        if(usable){
+            // 保存当前账号
+            UserLibrary userLibrary = new UserLibrary();
+            userLibrary.setUserId(Integer.valueOf(userId));
+            userLibrary.setStudentId(student_id);
+            userLibrary.setPassword(password);
+            userLibrary.setVerify(1);
+            this.baseMapper.update(userLibrary, new EntityWrapper<UserLibrary>().eq("user_id",userLibrary.getUserId()));
+        } else {
+            throw new WSExcetpion("图书馆账号或密码不正确");
+        }
+    }
+
+    /**
+     * @Author lixingyong
+     * @Description //TODO 判断用户账号是否可用，并返回账号密码
+     * @Date 2019/3/18
+     * @Param [userId]
+     * @return java.util.Map<java.lang.String                                                               ,                                                               java.lang.String>
+     **/
+    @Override
+    public UserLibrary getUserAccount(UserLibrary userLibrary) {
+        Map<String,Object> map = new HashMap<>();
+        map.put("user_id",userLibrary.getUserId());
+        map.put("verify", 1);
+        return this.baseMapper.selectList(new EntityWrapper<UserLibrary>().allEq(map)).get(0);
     }
 }

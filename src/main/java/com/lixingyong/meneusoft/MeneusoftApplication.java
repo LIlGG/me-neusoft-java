@@ -1,5 +1,7 @@
 package com.lixingyong.meneusoft;
 
+import org.mybatis.spring.annotation.MapperScan;
+import org.mybatis.spring.mapper.MapperScannerConfigurer;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
@@ -29,6 +31,5 @@ public class MeneusoftApplication {
         }
         return restTemplate;
     }
-
 
 }

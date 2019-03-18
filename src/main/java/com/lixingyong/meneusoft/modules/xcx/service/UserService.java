@@ -42,6 +42,4 @@ public interface UserService extends IService<User> {
      * @return void
      **/
     void insertOrUpdateJwcAccount(String user_id, String student_id, String password, String code);
-
-    void insertOrUpdateLibraryAccount(String userId, String student_id, String password);
 }

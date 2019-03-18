@@ -10,6 +10,7 @@ import com.lixingyong.meneusoft.modules.xcx.annotation.LoginUser;
 import com.lixingyong.meneusoft.modules.xcx.annotation.Token;
 import com.lixingyong.meneusoft.modules.xcx.entity.User;
 import com.lixingyong.meneusoft.modules.xcx.entity.Wechat;
+import com.lixingyong.meneusoft.modules.xcx.service.UserLibraryService;
 import com.lixingyong.meneusoft.modules.xcx.service.UserService;
 import com.lixingyong.meneusoft.modules.xcx.service.WechatService;
 import com.lixingyong.meneusoft.modules.xcx.vo.LoginVO;
@@ -39,6 +40,8 @@ public class UserController {
     private WechatService wechatService;
     @Autowired
     private UserService userService;
+    @Autowired
+    private UserLibraryService userLibraryService;
 
     @ApiOperation("用户登录")
     @PostMapping("/login")
@@ -82,7 +85,7 @@ public class UserController {
         try {
             // 更新或新增当前用户的教务处账号和密码
             userService.insertOrUpdateJwcAccount(userId,student_id, password, vcode);
-            JWCUtil.stuXyjzqk(1);
+            JWCUtil.stuXyjzqk(Long.parseLong(userId));
         } catch (NullPointerException e){
             return R.error("当前用户不存在或账号密码为空");
         } catch (WSExcetpion e){
@@ -97,7 +100,7 @@ public class UserController {
     public R library(@RequestParam String student_id, @RequestParam String password, @LoginUser String userId){
         // 更新或新增当前用户的图书馆账号和密码
         try {
-            userService.insertOrUpdateLibraryAccount(userId,student_id,password);
+            userLibraryService.insertOrUpdateLibraryAccount(userId,student_id,password);
         }catch (NullPointerException e){
             return R.error("当前用户不存在或账号密码为空");
         }catch (WSExcetpion e){
