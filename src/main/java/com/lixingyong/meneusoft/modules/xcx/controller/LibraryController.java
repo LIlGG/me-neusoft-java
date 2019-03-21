@@ -8,12 +8,14 @@ import com.lixingyong.meneusoft.modules.xcx.entity.LibraryBook;
 import com.lixingyong.meneusoft.modules.xcx.entity.UserLibrary;
 import com.lixingyong.meneusoft.modules.xcx.service.LibraryBookService;
 import com.lixingyong.meneusoft.modules.xcx.service.UserLibraryService;
+import com.lixingyong.meneusoft.modules.xcx.vo.BookSearchVO;
+import com.lixingyong.meneusoft.modules.xcx.vo.DetailBookVO;
+import io.micrometer.core.instrument.search.Search;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * @ClassName com.lixingyong.meneusoft.modules.xcx.controller
@@ -51,5 +53,48 @@ public class LibraryController {
             return R.error(e.getMsg());
         }
         return R.error();
+    }
+
+    /**
+     * @Author lixingyong
+     * @Description //TODO 图书搜索
+     * @Date 2019/3/20
+     * @Param
+     * @return
+     **/
+    @PostMapping("/search")
+    public R booksSearch(@RequestParam Map<String,Object> params){
+        try {
+            BookSearchVO bookSearchVOS = libraryBookService.searchBook(params);
+            if(null == bookSearchVOS){
+                throw new WSExcetpion("获取数据有误，请稍候再试");
+            }
+            return R.ok().put("data", bookSearchVOS);
+        }catch (WSExcetpion e){
+            return R.error(e.getMsg());
+        }
+    }
+
+    /**
+     * @Author lixingyong
+     * @Description //TODO 图书详细资料查询
+     * @Date 2019/3/21
+     * @Param
+     * @return
+     **/
+    @PostMapping("/detailBook")
+    public R detailBook(@RequestParam String detailId){
+        try{
+            DetailBookVO detailBookVO = libraryBookService.getBookDetail(detailId);
+            if(null == detailId){
+                throw new WSExcetpion("获取数据有误，请稍候再试");
+            }
+            if(null == detailBookVO){
+                throw new WSExcetpion("无详细信息，请稍候重试");
+            }
+            return R.ok().put("details", detailBookVO);
+        }catch (WSExcetpion e){
+            return R.error(e.getMsg());
+        }
     }
 }

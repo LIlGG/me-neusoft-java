@@ -18,4 +18,10 @@ public final class LibraryAPI {
 
     /** 图书馆借阅历史查询*/
     public static final String LIBRARYHISTORY = LIBRARYREADER+ "/reader/readerHistory.jsp";
+
+    /** 图书馆图书搜索 */
+    public static final String SEARCH = LIBRARYREADER + "/book/queryOut.jsp";
+
+    /** 图书信息详细信息查询*/
+    public static final String DETAILS = LIBRARYREADER + "/book/detailBook.jsp?rec_ctrl_id={rid}";
 }

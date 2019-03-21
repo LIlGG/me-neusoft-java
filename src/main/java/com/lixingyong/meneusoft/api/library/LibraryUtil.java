@@ -6,8 +6,11 @@ import com.lixingyong.meneusoft.common.exception.WSExcetpion;
 import com.lixingyong.meneusoft.common.utils.DateUtils;
 import com.lixingyong.meneusoft.common.utils.RedisUtils;
 import com.lixingyong.meneusoft.modules.xcx.entity.LibraryBook;
+import com.lixingyong.meneusoft.modules.xcx.vo.BookSearchVO;
+import com.lixingyong.meneusoft.modules.xcx.vo.CollectBook;
+import com.lixingyong.meneusoft.modules.xcx.vo.DetailBookVO;
+import com.lixingyong.meneusoft.modules.xcx.vo.SearchBooksVO;
 import org.jsoup.Jsoup;
-import org.jsoup.helper.StringUtil;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
@@ -196,6 +199,186 @@ public class LibraryUtil {
                 break;
         }
     }
+
+
+    /**
+     * @Author lixingyong
+     * @Description //TODO 图书检索
+     * @Date 2019/3/18
+     * @Param [restTemplate]
+     * @return void
+     **/
+    public static BookSearchVO bookSearch(String title, int curPage){
+        System.setProperty("http.proxyHost", "localhost");
+        System.setProperty("http.proxyPort", "9999");
+        System.setProperty("https.proxyHost", "localhost");
+        System.setProperty("https.proxyPort", "9999");
+        HttpHeaders headers = new HttpHeaders();
+        headers.set("User-Agent","Mozilla/5.0 (Windows NT 6.3; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/70.0.3538.102 Safari/537.36");
+        headers.set("Content-Type","application/x-www-form-urlencoded;charset=gb2312");
+        // 判断redis中是否存着对应的Cookie
+        if(!redisUtils.hasKey("SVPNCOOKIE")){
+            throw new WSExcetpion("redis中数据不完善");
+        }
+        List<String> cookiesList = new ArrayList<>();
+        cookiesList.add(redisUtils.get("SVPNCOOKIE"));
+        headers.put(HttpHeaders.COOKIE,cookiesList); //将Cookies放入Header
+        MultiValueMap<String,String> param = new LinkedMultiValueMap<>();
+        param.add("type","title");
+        param.add("word", title);
+        param.add("match","mh");
+        param.add("recordtype","01");
+        param.add("library_id","all");
+        if(curPage == 1){
+            param.add("kind","simple");
+            param.add("x","14");
+            param.add("y","4");
+        } else{
+            param.add("searchtimes","1");
+            param.add("size", "10");
+            param.add("curpage", Integer.toString(curPage));
+            param.add("apabi_page","1");
+            param.add("orderby","title");
+            param.add("ordersc","asc");
+            param.add("page", Integer.toString(curPage - 1));
+            param.add("pagesize", "10");
+            param.add("page", Integer.toString(curPage - 1));
+            param.add("pagesize", "10");
+        }
+
+        HttpEntity<MultiValueMap<String,String>> request = new HttpEntity<>(param,headers);//将参数和header组成一个请求
+        map.put("sid",redisUtils.get("SID"));
+        ResponseEntity<String> responseEntity = restTemplate.exchange(VPNAPI.PROXY+LibraryAPI.SEARCH,HttpMethod.POST,request,String.class,map);
+        if(responseEntity.getStatusCode().is2xxSuccessful()){
+            try{
+                String html = new String(responseEntity.getBody().getBytes("ISO-8859-1"),"GBK");
+                // 获取所有的table
+                Document document = Jsoup.parse(html);
+                return bookSearchHtml(document);
+            }catch (UnsupportedEncodingException e){
+                throw new WSExcetpion("字符串编码转换错误");
+            }
+        }
+        return null;
+    }
+
+    private static BookSearchVO bookSearchHtml(Document document) {
+        BookSearchVO bookSearchVOList = new BookSearchVO();
+        Elements elements = document.select("table[width='97%']");
+        Element books = elements.get(1).select("table[width='97%']").first();
+        // 获取当前节点的所有tr节点
+        Elements tr = books.select("tr");
+        List<SearchBooksVO> booksVOList = new LinkedList<>();
+        // 从第2个tr节点起开始遍历，直到最后一个
+        for(int i = 1; i < tr.size(); i++){
+            // 组装bookSearch
+            SearchBooksVO searchBooksVO = booksSearchTd(tr.get(i));
+            if(searchBooksVO != null){
+                booksVOList.add(searchBooksVO);
+            }
+        }
+        bookSearchVOList.setBooks(booksVOList);
+        // 设置序号
+        Element parentBook = books.parent().select("table").get(1).select("tr").get(1).select("td").first();
+        bookSearchVOList.setCurPage(parentBook.select("b").first().text());
+        bookSearchVOList.setPageSize(parentBook.select("b").last().text());
+        return bookSearchVOList;
+    }
+
+    private static SearchBooksVO booksSearchTd(Element element) {
+        Elements tds = element.select("td");
+        String title = tds.get(1).select("a").first().text();
+        if(title.equals("")){
+            return null;
+        }
+        SearchBooksVO searchBooksVO = new SearchBooksVO();
+        searchBooksVO.setTitle(title);
+        searchBooksVO.setAuthor(tds.get(2).text());
+        searchBooksVO.setCover("");
+        searchBooksVO.setPress(tds.get(3).text());
+        searchBooksVO.setPublish_year(tds.get(5).text());
+        String href = tds.get(1).select("a").first().attr("href");
+        String id = href.substring(href.lastIndexOf(href.lastIndexOf("'") - 1) + 2, href.lastIndexOf("'"));
+        searchBooksVO.setDetailId(id);
+        return searchBooksVO;
+    }
+
+    /**
+     * @Author lixingyong
+     * @Description //TODO 查询某个书籍详细的内容
+     * @Date 2019/3/21
+     * @Param [detailId]， 当前所选书籍的URL id
+     * @return com.lixingyong.meneusoft.modules.xcx.vo.DetailBookVO
+     **/
+    public static DetailBookVO detailBook(String detailId) {
+        System.setProperty("http.proxyHost", "localhost");
+        System.setProperty("http.proxyPort", "9999");
+        System.setProperty("https.proxyHost", "localhost");
+        System.setProperty("https.proxyPort", "9999");
+        HttpHeaders headers = new HttpHeaders();
+        headers.set("User-Agent","Mozilla/5.0 (Windows NT 6.3; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/70.0.3538.102 Safari/537.36");
+        // 判断redis中是否存着对应的Cookie
+        if(!redisUtils.hasKey("SVPNCOOKIE")){
+            throw new WSExcetpion("redis中数据不完善");
+        }
+        List<String> cookiesList = new ArrayList<>();
+        cookiesList.add(redisUtils.get("SVPNCOOKIE"));
+        headers.put(HttpHeaders.COOKIE,cookiesList); //将Cookies放入Header
+        HttpEntity<MultiValueMap<String,String>> request = new HttpEntity<>(null,headers);//将参数和header组成一个请求
+        map.put("sid",redisUtils.get("SID"));
+        map.put("rid", detailId);
+        ResponseEntity<String> responseEntity = restTemplate.exchange(VPNAPI.PROXY+LibraryAPI.DETAILS,HttpMethod.GET,request,String.class,map);
+        if(responseEntity.getStatusCode().is2xxSuccessful()){
+            try {
+                String html = new String(responseEntity.getBody().getBytes("ISO-8859-1"),"GBK");
+                Document document = Jsoup.parse(html);
+                return bookDetailHtml(document);
+            } catch (UnsupportedEncodingException e) {
+                throw new WSExcetpion("字符串编码转换错误");
+            }
+        } else {
+            return null;
+        }
+    }
+
+    /**
+     * @Author lixingyong
+     * @Description //TODO 查询Tr并遍历
+     * @Date 2019/3/21
+     * @Param [document]
+     * @return com.lixingyong.meneusoft.modules.xcx.vo.DetailBookVO
+     **/
+    private static DetailBookVO bookDetailHtml(Document document) {
+        Elements tables = document.select("table[width='97%']");
+        Elements tr = tables.get(3).select("tr");
+        List<CollectBook> collectBooks = new ArrayList<>();
+        String number = null;
+        for(int i = 2; i < tr.size(); i++){
+            //使用tr进行拼接
+            if(tr.get(i).select("td").size() > 1){
+                number = collectBooksTd(tr.get(i),collectBooks);
+            }
+
+        }
+        if(null == number){
+            return null;
+        }
+        DetailBookVO detailBookVO = new DetailBookVO();
+        detailBookVO.setNumber(number);
+        detailBookVO.setBook_addresses(collectBooks);
+        return detailBookVO;
+    }
+
+    private static String collectBooksTd(Element element, List<CollectBook> collectBooks) {
+        Elements tds = element.select("td");
+        CollectBook collectBook = new CollectBook();
+        collectBook.setAddress(tds.get(4).text());
+        collectBook.setBookStatus(tds.get(5).text());
+        collectBook.setDueData(tds.get(6).text());
+        collectBooks.add(collectBook);
+        return tds.get(2).text();
+    }
+
     @Autowired(required = true)
     public void setRestTemplate(RestTemplate restTemplate){
         this.restTemplate = restTemplate;

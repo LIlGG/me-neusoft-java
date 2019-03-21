@@ -3,8 +3,6 @@ package com.lixingyong.meneusoft.modules.xcx.service;
 import com.baomidou.mybatisplus.service.IService;
 import com.lixingyong.meneusoft.modules.xcx.entity.UserLibrary;
 
-import java.util.Map;
-
 public interface UserLibraryService extends IService<UserLibrary> {
     /**
      * @Author lixingyong

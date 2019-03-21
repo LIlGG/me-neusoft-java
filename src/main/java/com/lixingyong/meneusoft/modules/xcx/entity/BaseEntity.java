@@ -2,7 +2,9 @@ package com.lixingyong.meneusoft.modules.xcx.entity;
 
 import com.baomidou.mybatisplus.activerecord.Model;
 import com.baomidou.mybatisplus.annotations.TableField;
+import com.baomidou.mybatisplus.annotations.TableId;
 import com.baomidou.mybatisplus.enums.FieldFill;
+import com.baomidou.mybatisplus.enums.IdType;
 import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
@@ -23,7 +25,7 @@ import java.util.Date;
 public abstract class BaseEntity<T extends Model> extends Model<T> implements Serializable {
     private static final long serialVersionUID = 1L;
 
-    @TableField(value = "id")
+    @TableId(type=IdType.AUTO)
     protected int id;
     /**
      * @Author lixingyong
