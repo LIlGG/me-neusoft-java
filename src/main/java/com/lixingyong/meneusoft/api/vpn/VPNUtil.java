@@ -1,23 +1,15 @@
 package com.lixingyong.meneusoft.api.vpn;
 
-import com.google.gson.Gson;
+import com.lixingyong.meneusoft.api.utils.RestUtils;
 import com.lixingyong.meneusoft.common.exception.WSExcetpion;
-import com.lixingyong.meneusoft.common.utils.JSONUtils;
 import com.lixingyong.meneusoft.common.utils.RedisUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.*;
-import org.springframework.http.client.SimpleClientHttpRequestFactory;
-import org.springframework.http.converter.HttpMessageConverter;
-import org.springframework.http.converter.StringHttpMessageConverter;
-import org.springframework.stereotype.Component;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
 
-import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -29,11 +21,10 @@ import java.util.List;
  * @Date 2018/11/5 11:51
  * @Version 1.0
  */
-@Component
-public class  VPNUtil {
 
-    private static RestTemplate restTemplate;
-    private static RedisUtils redisUtils;
+public class  VPNUtil {
+    private static RestTemplate restTemplate = RestUtils.getRestTemplate();
+    private static RedisUtils redisUtils = RestUtils.getRedisUtils();
     private static Logger logger = LoggerFactory.getLogger(VPNUtil.class);
 
     /**
@@ -194,25 +185,5 @@ public class  VPNUtil {
             return true;
         }
         return false;
-    }
-
-    @Autowired(required = true)
-    private void setRestTemplate(RestTemplate restTemplate){
-        List<HttpMessageConverter<?>> converters = restTemplate.getMessageConverters();
-        converters.remove(1);
-        HttpMessageConverter<?> converter = new StringHttpMessageConverter(StandardCharsets.UTF_8);
-        converters.add(1,converter);
-        /** 设置超时时间 */
-        SimpleClientHttpRequestFactory simpleClientHttpRequestFactory = new SimpleClientHttpRequestFactory();
-        simpleClientHttpRequestFactory.setConnectTimeout(60 * 1000);
-        simpleClientHttpRequestFactory.setReadTimeout(60 * 1000);
-        restTemplate.setMessageConverters(converters);
-        restTemplate.setRequestFactory(simpleClientHttpRequestFactory);
-        this.restTemplate = restTemplate;
-    }
-
-    @Autowired(required = true)
-    private void setRedisUtils(RedisUtils redisUtils){
-        this.redisUtils = redisUtils;
     }
 }

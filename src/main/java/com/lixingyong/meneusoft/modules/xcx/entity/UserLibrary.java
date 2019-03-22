@@ -33,6 +33,6 @@ public class UserLibrary extends BaseEntity {
     private int verify;
     @Override
     protected Serializable pkVal() {
-        return super.id;
+        return this.getId();
     }
 }

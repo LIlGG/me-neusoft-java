@@ -50,6 +50,6 @@ public class User extends BaseEntity {
     private UserLibrary userLibrary;
     @Override
     protected Serializable pkVal() {
-        return super.id;
+        return this.getId();
     }
 }

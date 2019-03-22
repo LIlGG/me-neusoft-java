@@ -1,6 +1,7 @@
 package com.lixingyong.meneusoft.api.jwc;
 
 import com.aliyun.oss.OSSClient;
+import com.lixingyong.meneusoft.api.utils.RestUtils;
 import com.lixingyong.meneusoft.api.vpn.VPNAPI;
 import com.lixingyong.meneusoft.common.exception.WSExcetpion;
 import com.lixingyong.meneusoft.common.utils.MD5Utils;
@@ -36,8 +37,8 @@ import java.util.Map;
  */
 @Component
 public class JWCUtil {
-    private static RestTemplate restTemplate;
-    private static RedisUtils redisUtils;
+    private static RestTemplate restTemplate = RestUtils.getRestTemplate();
+    private static RedisUtils redisUtils = RestUtils.getRedisUtils();
     private static Map<String,Object> map = new HashMap<>();
     /** 阿里云API的bucket名称 */
     private static String bucketName;
@@ -270,17 +271,6 @@ public class JWCUtil {
 
     private static String chkVCode(String code){
         return MD5Utils.getMD5String(MD5Utils.getMD5String(code.toUpperCase()).substring(0,30).toUpperCase()+"13631").substring(0,30).toUpperCase();
-    }
-
-
-    @Autowired(required = true)
-    public void setRestTemplate(RestTemplate restTemplate){
-        this.restTemplate = restTemplate;
-    }
-
-    @Autowired(required = true)
-    private void setRedisUtils(RedisUtils redisUtils){
-        this.redisUtils = redisUtils;
     }
 
     @Value("${aliyun.oss.bucketName}")

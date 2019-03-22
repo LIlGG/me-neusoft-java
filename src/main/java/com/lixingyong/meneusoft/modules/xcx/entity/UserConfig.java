@@ -34,6 +34,6 @@ public class UserConfig extends BaseEntity {
 
     @Override
     protected Serializable pkVal() {
-        return super.id;
+        return this.getId();
     }
 }

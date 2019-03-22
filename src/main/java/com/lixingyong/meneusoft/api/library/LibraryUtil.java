@@ -1,5 +1,6 @@
 package com.lixingyong.meneusoft.api.library;
 
+import com.lixingyong.meneusoft.api.utils.RestUtils;
 import com.lixingyong.meneusoft.api.vpn.VPNAPI;
 import com.lixingyong.meneusoft.api.vpn.VPNUtil;
 import com.lixingyong.meneusoft.common.exception.WSExcetpion;
@@ -36,10 +37,9 @@ import java.util.*;
  * @Author mail@lixingyong.com
  * @Date 2019-03-16 15:23
  */
-@Component
 public class LibraryUtil {
-    private static RestTemplate restTemplate;
-    private static RedisUtils redisUtils;
+    private static RestTemplate restTemplate = RestUtils.getRestTemplate();
+    private static RedisUtils redisUtils = RestUtils.getRedisUtils();
     private static Map<String,Object> map = new HashMap<>();
     private static Logger logger = LoggerFactory.getLogger(VPNUtil.class);
     /**
@@ -379,13 +379,4 @@ public class LibraryUtil {
         return tds.get(2).text();
     }
 
-    @Autowired(required = true)
-    public void setRestTemplate(RestTemplate restTemplate){
-        this.restTemplate = restTemplate;
-    }
-
-    @Autowired(required = true)
-    private void setRedisUtils(RedisUtils redisUtils){
-        this.redisUtils = redisUtils;
-    }
 }

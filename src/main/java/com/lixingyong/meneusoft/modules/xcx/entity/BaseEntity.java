@@ -24,9 +24,6 @@ import java.util.Date;
 @Setter
 public abstract class BaseEntity<T extends Model> extends Model<T> implements Serializable {
     private static final long serialVersionUID = 1L;
-
-    @TableId(type=IdType.AUTO)
-    protected int id;
     /**
      * @Author lixingyong
      * @Description //TODO 新增日期

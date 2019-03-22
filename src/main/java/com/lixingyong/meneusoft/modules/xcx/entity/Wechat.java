@@ -33,6 +33,6 @@ public class Wechat extends BaseEntity {
     private int userId;
     @Override
     protected Serializable pkVal() {
-        return  super.id;
+        return this.getId();
     }
 }

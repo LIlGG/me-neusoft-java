@@ -1,6 +1,7 @@
 package com.lixingyong.meneusoft.modules.xcx.entity;
 
 import com.baomidou.mybatisplus.annotations.TableField;
+import com.baomidou.mybatisplus.annotations.TableId;
 import com.baomidou.mybatisplus.annotations.TableName;
 import lombok.Data;
 
@@ -17,6 +18,8 @@ import java.io.Serializable;
 @TableName("notice")
 @Data
 public class Notice extends BaseEntity {
+    @TableId
+    private int id;
     private String title;
 
     private String cover;
@@ -29,9 +32,8 @@ public class Notice extends BaseEntity {
     private int status;
 
     private int newest;
-
     @Override
     protected Serializable pkVal() {
-        return super.id;
+        return this.getId();
     }
 }

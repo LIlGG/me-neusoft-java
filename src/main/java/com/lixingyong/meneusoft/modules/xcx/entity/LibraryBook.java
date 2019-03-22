@@ -19,9 +19,6 @@ import java.util.Date;
 @TableName("library_book")
 @Data
 public class LibraryBook extends BaseEntity {
-    @TableField(exist = false)
-    private int id;
-
     private int userId;
     /** 是否为历史借阅 0： 否 1： 是 */
     private int isHistory;
@@ -50,6 +47,6 @@ public class LibraryBook extends BaseEntity {
     private String number;
     @Override
     protected Serializable pkVal() {
-        return super.id;
+        return this.getUserId();
     }
 }
