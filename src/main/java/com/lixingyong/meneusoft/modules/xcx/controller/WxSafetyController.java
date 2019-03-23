@@ -4,10 +4,15 @@ import com.lixingyong.meneusoft.api.jwc.JWCUtil;
 import com.lixingyong.meneusoft.api.vpn.VPNUtil;
 import com.lixingyong.meneusoft.api.wx.WxUtil;
 import com.lixingyong.meneusoft.common.utils.*;
+import com.lixingyong.meneusoft.modules.xcx.annotation.LoginUser;
 import com.lixingyong.meneusoft.modules.xcx.annotation.Token;
+import com.lixingyong.meneusoft.modules.xcx.entity.User;
+import com.lixingyong.meneusoft.modules.xcx.entity.Wechat;
 import com.lixingyong.meneusoft.modules.xcx.entity.WxUser;
+import com.lixingyong.meneusoft.modules.xcx.service.WechatService;
 import com.lixingyong.meneusoft.modules.xcx.service.WxUserService;
 import com.lixingyong.meneusoft.modules.xcx.utils.LoginUtil;
+import com.lixingyong.meneusoft.modules.xcx.utils.wx.crypto.WXCore;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,7 +30,6 @@ import java.util.*;
  */
 
 @RestController
-@RequestMapping("/api/wechat")
 @Api("微信安全控制接口")
 public class WxSafetyController {
     @Autowired
@@ -34,6 +38,8 @@ public class WxSafetyController {
     private JwtUtils jwtUtils;
     @Autowired
     private WxUserService wxUserService;
+    @Autowired
+    private WechatService wechatService;
     /**
      * @Author lixingyong
      * @Description //TODO 微信用户授权接口及登录
@@ -76,9 +82,25 @@ public class WxSafetyController {
     }
 
     @Token
-    @PostMapping(value = "/test")
-    public void test() {
-        System.out.println("测试");
+    @PostMapping(value = "/unionid")
+    public R unionid(@RequestParam Map<String,String> params, @LoginUser String userId){
+        // 获取用户信息
+        try {
+            Wechat wechat = wechatService.selectByUserId(userId);
+            if(null != wechat){
+                // 执行加密解密
+                String result = WXCore.decrypt(params.get("encrypted_data"), wechat.getSessionKey(), params.get("iv"));
+                if(!result.equals("")){
+                    // 将数据保存到数据库中
+                    wechatService.addOtherData(wechat ,result);
+                    return R.ok();
+                }
+            }
+            return R.error("用户数据为空");
+        }catch (Exception e){
+            return R.error("获取用户信息失败,请重新登录再试");
+        }
+
     }
 
     @GetMapping(value = "/getVPN")

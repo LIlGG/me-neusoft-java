@@ -6,6 +6,8 @@ import com.lixingyong.meneusoft.common.exception.WSExcetpion;
 import com.lixingyong.meneusoft.modules.xcx.dao.WxUserDao;
 import com.lixingyong.meneusoft.modules.xcx.entity.WxUser;
 import com.lixingyong.meneusoft.modules.xcx.service.WxUserService;
+import org.springframework.boot.configurationprocessor.json.JSONException;
+import org.springframework.boot.configurationprocessor.json.JSONObject;
 import org.springframework.stereotype.Service;
 
 import java.util.List;

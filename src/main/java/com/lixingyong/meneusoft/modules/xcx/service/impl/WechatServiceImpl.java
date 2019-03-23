@@ -4,7 +4,10 @@ import com.baomidou.mybatisplus.mapper.EntityWrapper;
 import com.baomidou.mybatisplus.service.impl.ServiceImpl;
 import com.lixingyong.meneusoft.modules.xcx.dao.WechatDao;
 import com.lixingyong.meneusoft.modules.xcx.entity.Wechat;
+import com.lixingyong.meneusoft.modules.xcx.entity.WxUser;
 import com.lixingyong.meneusoft.modules.xcx.service.WechatService;
+import org.springframework.boot.configurationprocessor.json.JSONException;
+import org.springframework.boot.configurationprocessor.json.JSONObject;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -39,6 +42,22 @@ public class WechatServiceImpl extends ServiceImpl<WechatDao, Wechat> implements
         }
         return null;
     }
+    @Override
+    public Wechat selectByUserId(String userId) {
+        return this.baseMapper.selectList(new EntityWrapper<Wechat>().eq("user_id", userId)).get(0);
+    }
 
+    @Override
+    public void addOtherData(Wechat wechat, String result) throws JSONException {
+        JSONObject jsonObject = new JSONObject(result);
+        wechat.setNickName(jsonObject.get("nickName").toString());
+        wechat.setAvatarUrl(jsonObject.get("avatarUrl").toString());
+        if(Integer.valueOf(jsonObject.get("gender").toString()) == 0){
+            wechat.setGender("男");
+        }else{
+            wechat.setGender("女");
+        }
 
+        this.insert(wechat);
+    }
 }

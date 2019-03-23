@@ -56,7 +56,7 @@ public class UserLibraryServiceImpl extends ServiceImpl<UserLibraryDao, UserLibr
             userLibrary.setVerify(1);
             this.baseMapper.update(userLibrary, new EntityWrapper<UserLibrary>().eq("user_id",userLibrary.getUserId()));
         } else {
-            throw new WSExcetpion("图书馆账号或密码不正确");
+            throw new WSExcetpion("图书馆登录失败，请稍候再试");
         }
     }
 
