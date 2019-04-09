@@ -25,7 +25,7 @@ public class UserConfig extends BaseEntity {
     private int userId;
 
     /** 通知设置 */
-    private String notify;
+    private int notify;
 
     /** 用户身份类型
      *  0：本科 1：专科

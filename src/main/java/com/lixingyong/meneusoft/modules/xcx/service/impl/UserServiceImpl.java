@@ -80,12 +80,20 @@ public class UserServiceImpl extends ServiceImpl<UserDao, User> implements UserS
         if(usable){
             User user = new User();
             user.setId(Integer.valueOf(user_id));
-            user.setStudentId(student_id);
+            user.setJwcStudentId(student_id);
             user.setJwcPassword(password);
             user.setJwcVerify(1);
             this.insertOrUpdate(user);
         }
         throw new WSExcetpion("教务处账号或密码不正确");
+    }
+
+    @Override
+    public void insertOrUpdateEcardInfo(String userId, String id) {
+        User user = new User();
+        user.setId(Integer.valueOf(userId));
+        user.setEcardId(id);
+        this.insertOrUpdate(user);
     }
 
 }

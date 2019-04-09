@@ -9,15 +9,19 @@ import com.lixingyong.meneusoft.common.utils.R;
 import com.lixingyong.meneusoft.modules.xcx.annotation.LoginUser;
 import com.lixingyong.meneusoft.modules.xcx.annotation.Token;
 import com.lixingyong.meneusoft.modules.xcx.entity.User;
+import com.lixingyong.meneusoft.modules.xcx.entity.UserConfig;
 import com.lixingyong.meneusoft.modules.xcx.entity.Wechat;
+import com.lixingyong.meneusoft.modules.xcx.service.UserConfigService;
 import com.lixingyong.meneusoft.modules.xcx.service.UserLibraryService;
 import com.lixingyong.meneusoft.modules.xcx.service.UserService;
 import com.lixingyong.meneusoft.modules.xcx.service.WechatService;
 import com.lixingyong.meneusoft.modules.xcx.vo.LoginVO;
+import io.netty.util.internal.StringUtil;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
+import io.swagger.models.auth.In;
 import lombok.extern.java.Log;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -42,6 +46,8 @@ public class UserController {
     private UserService userService;
     @Autowired
     private UserLibraryService userLibraryService;
+    @Autowired
+    private UserConfigService userConfigService;
 
     @ApiOperation("用户登录")
     @PostMapping("/login")
@@ -109,6 +115,25 @@ public class UserController {
         return R.ok("绑定图书馆成功");
     }
 
+    @Token
+    @ApiOperation("绑定一卡通")
+    @PostMapping("/ecard/bind")
+    public R eCardBind(@RequestParam String  result,@LoginUser String userId){
+        try {
+            //截取最后的id
+            if(result.startsWith("http")){
+                String[] ids = result.split("/");
+                String id = ids[ids.length - 1];
+                // 将当前id保存起来
+                userService.insertOrUpdateEcardInfo(userId, id);
+                return R.ok("绑定一卡通成功");
+            } else {
+                return R.error("扫码数据不正确");
+            }
+        }catch (WSExcetpion e){
+            return R.error(e.getMsg());
+        }
+    }
     @ApiOperation("获取当前用户反馈列表")
     @GetMapping("/user/feedbacks")
     public R getFeedbacks(){
@@ -141,14 +166,18 @@ public class UserController {
      */
     @ApiOperation("用户通知设置 二进制表示")
     @PostMapping("/user/config/notify")
-    public R setUserConfigNotify(){
-        return null;
+    @Token
+    public R setUserConfigNotify(@RequestParam("notify") String notify, @LoginUser String userId){
+        userConfigService.setUserConfigNotify(notify, userId);
+        return R.ok("设置成功");
     }
 
     @ApiOperation("获取用户通知设置")
     @GetMapping("/user/config/notify")
-    public R getUserConfigNotify(){
-        return null;
+    @Token
+    public R getUserConfigNotify(@LoginUser String userId){
+        UserConfig userConfig =  userConfigService.getUserConfig(Integer.valueOf(userId));
+        return R.ok(userConfig.getNotify());
     }
 
     @ApiOperation("设置用户类型")

@@ -14,4 +14,6 @@ public interface UserConfigService extends IService<UserConfig> {
     void init(int id);
 
     UserConfig getUserConfig(int userId);
+
+    void setUserConfigNotify(String notify, String userId);
 }

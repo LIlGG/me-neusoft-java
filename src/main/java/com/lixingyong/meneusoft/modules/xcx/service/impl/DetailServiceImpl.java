@@ -32,6 +32,8 @@ public class DetailServiceImpl extends ServiceImpl<DetailDao, Detail> implements
         // 获取到标签URL之后直接返回最新的新闻内容并更新或保存
         String url;
         if(params.get("tag_name").equals("") || params.get("tag_name").equals("全部")){
+            //更新标签
+//            tagService.getTagList();
             url = NewsAPI.NEWS_HOME;
         } else {
             // 根据标签查询url

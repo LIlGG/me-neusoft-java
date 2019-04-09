@@ -123,7 +123,7 @@ public class JWCUtil {
         }
         throw new WSExcetpion("获取教务处登录信息失败");
     }
-    
+
     /**
      * @Author lixingyong
      * @Description //TODO 获取验证码

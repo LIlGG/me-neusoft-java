@@ -43,6 +43,8 @@ public class User extends BaseEntity {
      */
     private int  verify;
 
+    private String ecardId;
+
     @TableField(exist = false)
     private Wechat wechat;
 

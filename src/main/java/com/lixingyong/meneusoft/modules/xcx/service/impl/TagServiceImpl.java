@@ -25,13 +25,13 @@ public class TagServiceImpl extends ServiceImpl<TagDao, Tag> implements TagServi
         if(tags.size() < 1){ //为空则直接从官网更新标签
             tags = NewsUtil.getTagList();
             //向数据库中添加标签
-            this.insertBatch(tags);
+            this.insertOrUpdateBatch(tags);
         }
         return tags;
     }
 
     @Override
     public Tag getTag(String tag_name) {
-        return this.baseMapper.selectList(new EntityWrapper<Tag>().eq("name",tag_name)).get(0);
+       return this.baseMapper.selectList(new EntityWrapper<Tag>().eq("name",tag_name)).get(0);
     }
 }

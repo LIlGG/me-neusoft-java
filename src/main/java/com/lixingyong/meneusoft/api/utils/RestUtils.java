@@ -1,8 +1,16 @@
 package com.lixingyong.meneusoft.api.utils;
 
+import com.lixingyong.meneusoft.common.config.MyRedirectStrategy;
 import com.lixingyong.meneusoft.common.utils.RedisUtils;
+import com.lixingyong.meneusoft.modules.xcx.service.EcardService;
 import com.lixingyong.meneusoft.modules.xcx.service.TagService;
+import org.apache.http.HttpRequestFactory;
+import org.apache.http.client.HttpClient;
+import org.apache.http.impl.client.HttpClientBuilder;
+import org.apache.http.impl.client.LaxRedirectStrategy;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.client.ClientHttpRequestFactory;
+import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
 import org.springframework.http.client.SimpleClientHttpRequestFactory;
 import org.springframework.http.converter.HttpMessageConverter;
 import org.springframework.http.converter.StringHttpMessageConverter;
@@ -23,7 +31,11 @@ public class RestUtils {
     private static RestTemplate restTemplate;
     private static RedisUtils redisUtils;
     private static TagService tagService;
+    private static EcardService ecardService;
 
+    public static EcardService getEcardService() {
+        return ecardService;
+    }
 
     @Autowired(required = true)
     private void setRestTemplate(RestTemplate restTemplate){
@@ -32,12 +44,21 @@ public class RestUtils {
         HttpMessageConverter<?> converter = new StringHttpMessageConverter(StandardCharsets.UTF_8);
         converters.add(1,converter);
         /** 设置超时时间 */
-        SimpleClientHttpRequestFactory simpleClientHttpRequestFactory = new SimpleClientHttpRequestFactory();
-        simpleClientHttpRequestFactory.setConnectTimeout(60 * 1000);
-        simpleClientHttpRequestFactory.setReadTimeout(60 * 1000);
+//        SimpleClientHttpRequestFactory simpleClientHttpRequestFactory = new SimpleClientHttpRequestFactory();
+//        simpleClientHttpRequestFactory.setConnectTimeout(60 * 1000);
+//        simpleClientHttpRequestFactory.setReadTimeout(60 * 1000);
+//
+        HttpClient httpClient = HttpClientBuilder.create()
+                .setRedirectStrategy(new MyRedirectStrategy())
+                .build();
+        HttpComponentsClientHttpRequestFactory httpRequestFactory = new HttpComponentsClientHttpRequestFactory();
+        httpRequestFactory.setConnectTimeout(30 * 1000);
+        httpRequestFactory.setReadTimeout(30 * 1000);
+        httpRequestFactory.setHttpClient(httpClient);
         restTemplate.setMessageConverters(converters);
-        restTemplate.setRequestFactory(simpleClientHttpRequestFactory);
+        restTemplate.setRequestFactory(httpRequestFactory);
         this.restTemplate = restTemplate;
+
     }
 
     @Autowired(required = true)
@@ -49,10 +70,14 @@ public class RestUtils {
     private void setTagService(TagService tagService){
         this.tagService = tagService;
     }
-
+    @Autowired
+    public void setEcardService(EcardService ecardService) {
+        this.ecardService = ecardService;
+    }
     public static RestTemplate getRestTemplate() {
         return restTemplate;
     }
+
 
     public static RedisUtils getRedisUtils() {
         return redisUtils;
