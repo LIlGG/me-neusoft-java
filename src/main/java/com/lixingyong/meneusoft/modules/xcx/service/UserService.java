@@ -44,4 +44,6 @@ public interface UserService extends IService<User> {
     void insertOrUpdateJwcAccount(String user_id, String student_id, String password, String code);
 
     void insertOrUpdateEcardInfo(String userId, String id);
+
+    void insertOrUpdateUfsAccount(String account, String password, String userId);
 }

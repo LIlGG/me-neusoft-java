@@ -80,8 +80,16 @@ public class UserController {
 
     @ApiOperation("绑定统一认证中心")
     @PostMapping("/bind")
-    public R bind(@RequestParam String student_id, @RequestParam String password){
-        return null;
+    @Token
+    public R bind(@RequestParam("student_id") String account, @RequestParam("password") String password, @LoginUser String userId){
+        try {
+            userService.insertOrUpdateUfsAccount(account,password, userId);
+        }catch (NullPointerException e){
+            return R.error("当前用户不存在或账号密码为空");
+        } catch (WSExcetpion e){
+            return R.error(e.getMsg());
+        }
+        return R.ok("绑定UFS成功");
     }
 
     @Token
@@ -134,29 +142,6 @@ public class UserController {
             return R.error(e.getMsg());
         }
     }
-    @ApiOperation("获取当前用户反馈列表")
-    @GetMapping("/user/feedbacks")
-    public R getFeedbacks(){
-        return null;
-    }
-
-    @ApiOperation("获取当前用户反馈列表")
-    @GetMapping("/user/feedback/{id}")
-    public R feedbacksInfo(@PathVariable int id){
-        return null;
-    }
-
-    @ApiOperation("新增一条反馈信息")
-    @PostMapping("/feedback")
-    public R setFeedback(){
-        return null;
-    }
-
-    @ApiOperation("新增一条反馈评论 :id 为反馈的id")
-    @PostMapping("/feedback/comment/{id}")
-    public R setFeedbackComment(){
-        return null;
-    }
 
     /**
      * | 二进制 | 十进制 | 说明           |
@@ -182,8 +167,14 @@ public class UserController {
 
     @ApiOperation("设置用户类型")
     @PostMapping("/user/config/type")
-    public R getUserConfig(){
-        return null;
+    @Token
+    public R getUserConfig(@RequestParam("user_type") String user_type,@LoginUser String userId){
+        try {
+            userConfigService.setUserType(Integer.valueOf(user_type), Integer.valueOf(userId));
+            return R.ok("更新成功");
+        }catch (Exception e){
+            return R.error("更新失败");
+        }
     }
 
     @ApiOperation("缓存微信模板消息id")

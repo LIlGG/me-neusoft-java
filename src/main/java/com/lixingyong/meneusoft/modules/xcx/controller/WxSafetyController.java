@@ -96,9 +96,9 @@ public class WxSafetyController {
                     return R.ok();
                 }
             }
-            return R.error("用户数据为空");
+            return R.error("用户数据为空，请重新登录！");
         }catch (Exception e){
-            return R.error("获取用户信息失败,请重新登录再试");
+            return R.error("获取用户信息失败,请重新登录再试！");
         }
 
     }

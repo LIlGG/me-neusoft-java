@@ -4,11 +4,13 @@ import com.lixingyong.meneusoft.common.config.MyRedirectStrategy;
 import com.lixingyong.meneusoft.common.utils.RedisUtils;
 import com.lixingyong.meneusoft.modules.xcx.service.EcardService;
 import com.lixingyong.meneusoft.modules.xcx.service.TagService;
+import com.lixingyong.meneusoft.modules.xcx.service.UserService;
 import org.apache.http.HttpRequestFactory;
 import org.apache.http.client.HttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.impl.client.LaxRedirectStrategy;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.client.ClientHttpRequestFactory;
 import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
 import org.springframework.http.client.SimpleClientHttpRequestFactory;
@@ -32,6 +34,17 @@ public class RestUtils {
     private static RedisUtils redisUtils;
     private static TagService tagService;
     private static EcardService ecardService;
+    private static UserService userService;
+    /** 阿里云API的bucket名称 */
+    private static String bucketName;
+    /** 阿里云API的文件夹名称 */
+    private static String folder;
+    /** 阿里云API的文件前缀 */
+    private static String codeFolder;
+    /** 阿里云API的文件后缀 */
+    private static String suffix;
+    /** github Token */
+    private static String token;
 
     public static EcardService getEcardService() {
         return ecardService;
@@ -74,6 +87,15 @@ public class RestUtils {
     public void setEcardService(EcardService ecardService) {
         this.ecardService = ecardService;
     }
+    @Autowired
+    public void setUserService(UserService userService) {
+        this.userService = userService;
+    }
+
+    public static UserService getUserService() {
+        return userService;
+    }
+
     public static RestTemplate getRestTemplate() {
         return restTemplate;
     }
@@ -85,5 +107,51 @@ public class RestUtils {
 
     public static TagService getTagService() {
         return tagService;
+    }
+
+
+    @Value("${github.token}")
+    public void setToken(String token) {
+        this.token = token;
+    }
+
+    @Value("${aliyun.oss.bucketName}")
+    public void setBucketName(String bucketName) {
+        this.bucketName = bucketName;
+    }
+
+    @Value("${aliyun.oss.folder}")
+    public void setFolder(String folder) {
+        this.folder = folder+"/";
+    }
+
+    @Value("${aliyun.oss.codefolder}")
+    public void setCodeFolder(String codefolder) {
+        this.codeFolder = codefolder;
+    }
+
+    @Value("${aliyun.oss.suffix}")
+    public void setSuffix(String suffix) {
+        this.suffix = suffix;
+    }
+
+    public static String getBucketName() {
+        return bucketName;
+    }
+
+    public static String getFolder() {
+        return folder;
+    }
+
+    public static String getCodeFolder() {
+        return codeFolder;
+    }
+
+    public static String getSuffix() {
+        return suffix;
+    }
+
+    public static String getToken() {
+        return token;
     }
 }

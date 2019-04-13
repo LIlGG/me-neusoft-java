@@ -35,19 +35,19 @@ import java.util.Map;
  * @Date 2018/11/29 14:57
  * @Version 1.0
  */
-@Component
+
 public class JWCUtil {
     private static RestTemplate restTemplate = RestUtils.getRestTemplate();
     private static RedisUtils redisUtils = RestUtils.getRedisUtils();
     private static Map<String,Object> map = new HashMap<>();
     /** 阿里云API的bucket名称 */
-    private static String bucketName;
+    private static String bucketName = RestUtils.getBucketName();
     /** 阿里云API的文件夹名称 */
-    private static String folder;
+    private static String folder = RestUtils.getFolder();
     /** 阿里云API的文件前缀 */
-    private static String codeFolder;
+    private static String codeFolder = RestUtils.getCodeFolder();
     /** 阿里云API的文件后缀 */
-    private static String suffix;
+    private static String suffix = RestUtils.getSuffix();
 
     private static Logger logger = LoggerFactory.getLogger(JWCUtil.class);
 
@@ -78,7 +78,7 @@ public class JWCUtil {
                         String[] cookies = responseEntity.getHeaders().get("Set-Cookie").get(0).split(";");
                         String ASPCookie = cookies[0];
                         //将获取到的数据存入redis数据库中并返回
-                        redisUtils.set(Long.toString(uid)+"ASPCOOKIE",ASPCookie);
+                        redisUtils.set(uid+"ASPCOOKIE",ASPCookie);
                         logger.info("获取教务处Cookie成功");
                         return;
                     }
@@ -105,7 +105,7 @@ public class JWCUtil {
         }
         List<String> cookiesList = new ArrayList<>();
         cookiesList.add(redisUtils.get("SVPNCOOKIE"));
-        cookiesList.add(redisUtils.get(Long.toString(uid)+"ASPCOOKIE"));
+        cookiesList.add(redisUtils.get(uid+"ASPCOOKIE"));
         headers.put(HttpHeaders.COOKIE,cookiesList); //将Cookies放入Header
         HttpEntity<String> request = new HttpEntity<>(null,headers);//将参数和header组成一个请求
         map.put("sid",redisUtils.get("SID"));
@@ -132,10 +132,6 @@ public class JWCUtil {
      * @return void
      **/
     public static String getValidateCode(long uid) throws WSExcetpion{
-        System.setProperty("http.proxyHost", "localhost");
-        System.setProperty("http.proxyPort", "9999");
-        System.setProperty("https.proxyHost", "localhost");
-        System.setProperty("https.proxyPort", "9999");
         HttpHeaders headers = new HttpHeaders();
         headers.set("User-Agent","Mozilla/5.0 (Windows NT 6.3; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/70.0.3538.102 Safari/537.36");
         // 判断redis中是否存着对应的Cookie
@@ -183,10 +179,6 @@ public class JWCUtil {
      * @return void
      **/
     public static void jwcStudentLogin(long uid, String account, String pw, String vCode) throws WSExcetpion{
-        System.setProperty("http.proxyHost", "localhost");
-        System.setProperty("http.proxyPort", "9999");
-        System.setProperty("https.proxyHost", "localhost");
-        System.setProperty("https.proxyPort", "9999");
         HttpHeaders headers = new HttpHeaders();
         headers.set("User-Agent","Mozilla/5.0 (Windows NT 6.3; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/70.0.3538.102 Safari/537.36");
         // 判断redis中是否存着对应的Cookie
@@ -242,10 +234,6 @@ public class JWCUtil {
 
     /** 教务处学生基本学分情况查询 */
     public static void stuXyjzqk(long uid){
-        System.setProperty("http.proxyHost", "localhost");
-        System.setProperty("http.proxyPort", "9999");
-        System.setProperty("https.proxyHost", "localhost");
-        System.setProperty("https.proxyPort", "9999");
         HttpHeaders headers = new HttpHeaders();
         headers.set("User-Agent","Mozilla/5.0 (Windows NT 6.3; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/70.0.3538.102 Safari/537.36");
         // 判断redis中是否存着对应的Cookie
@@ -273,23 +261,5 @@ public class JWCUtil {
         return MD5Utils.getMD5String(MD5Utils.getMD5String(code.toUpperCase()).substring(0,30).toUpperCase()+"13631").substring(0,30).toUpperCase();
     }
 
-    @Value("${aliyun.oss.bucketName}")
-    public void setBucketName(String bucketName) {
-        this.bucketName = bucketName;
-    }
 
-    @Value("${aliyun.oss.folder}")
-    public void setFolder(String folder) {
-        this.folder = folder+"/";
-    }
-
-    @Value("${aliyun.oss.codefolder}")
-    public void setCodeFolder(String codefolder) {
-        this.codeFolder = codefolder;
-    }
-
-    @Value("${aliyun.oss.suffix}")
-    public void setSuffix(String suffix) {
-        this.suffix = suffix;
-    }
 }

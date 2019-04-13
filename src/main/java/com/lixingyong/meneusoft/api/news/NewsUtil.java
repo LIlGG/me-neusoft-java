@@ -48,10 +48,6 @@ public class NewsUtil {
      * @return
      **/
     public static List<Detail> getNewsList(String url){
-        System.setProperty("http.proxyHost", "localhost");
-        System.setProperty("http.proxyPort", "9999");
-        System.setProperty("https.proxyHost", "localhost");
-        System.setProperty("https.proxyPort", "9999");
         HttpHeaders headers = new HttpHeaders();
         headers.set("User-Agent","Mozilla/5.0 (Windows NT 6.3; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/70.0.3538.102 Safari/537.36");
         HttpEntity<String> request = new HttpEntity<>(null,headers);//将参数和header组成一个请求
@@ -136,10 +132,6 @@ public class NewsUtil {
      * @return
      **/
     public static List<Tag> getTagList() {
-        System.setProperty("http.proxyHost", "localhost");
-        System.setProperty("http.proxyPort", "9999");
-        System.setProperty("https.proxyHost", "localhost");
-        System.setProperty("https.proxyPort", "9999");
         HttpHeaders headers = new HttpHeaders();
         headers.set("User-Agent","Mozilla/5.0 (Windows NT 6.3; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/70.0.3538.102 Safari/537.36");
         HttpEntity<String> request = new HttpEntity<>(null,headers);//将参数和header组成一个请求
@@ -173,10 +165,6 @@ public class NewsUtil {
      * @return java.lang.String
      **/
     public static String getNewDetail(String url) {
-        System.setProperty("http.proxyHost", "localhost");
-        System.setProperty("http.proxyPort", "9999");
-        System.setProperty("https.proxyHost", "localhost");
-        System.setProperty("https.proxyPort", "9999");
         HttpHeaders headers = new HttpHeaders();
         headers.set("User-Agent","Mozilla/5.0 (Windows NT 6.3; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/70.0.3538.102 Safari/537.36");
         HttpEntity<String> request = new HttpEntity<>(null,headers);//将参数和header组成一个请求

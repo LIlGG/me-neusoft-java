@@ -33,10 +33,6 @@ public class EcardUtil {
     private static Logger logger = LoggerFactory.getLogger(EcardUtil.class);
 
     public static void loginEcard(long uid, String ecardId) throws WSExcetpion {
-        System.setProperty("http.proxyHost", "localhost");
-        System.setProperty("http.proxyPort", "8888");
-        System.setProperty("https.proxyHost", "localhost");
-        System.setProperty("https.proxyPort", "8888");
         HttpEntity<String> request = new HttpEntity<>(null, null);
         map.put("ecardId",ecardId);
         ResponseEntity<Resource> responseEntity = restTemplate.exchange(EcardAPI.ECARDCOOKIE, HttpMethod.GET,request,Resource.class,map);

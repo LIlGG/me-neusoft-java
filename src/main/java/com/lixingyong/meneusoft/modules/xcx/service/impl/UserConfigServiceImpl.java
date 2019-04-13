@@ -44,4 +44,11 @@ public class UserConfigServiceImpl extends ServiceImpl<UserConfigDao, UserConfig
         this.baseMapper.update(userConfig, new EntityWrapper<UserConfig>().eq("user_id",Integer.valueOf(userId)));
     }
 
+    @Override
+    public void setUserType(Integer userType, Integer userId) {
+        UserConfig userConfig = this.getUserConfig(userId);
+        userConfig.setUserType(userType);
+        this.baseMapper.update(userConfig, new EntityWrapper<UserConfig>().eq("user_id", userId));
+    }
+
 }

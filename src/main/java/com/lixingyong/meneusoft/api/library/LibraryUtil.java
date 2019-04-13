@@ -50,10 +50,6 @@ public class LibraryUtil {
      * @return void
      **/
     public static void libraryLogin(long uid, String barcode, String password){
-        System.setProperty("http.proxyHost", "localhost");
-        System.setProperty("http.proxyPort", "9999");
-        System.setProperty("https.proxyHost", "localhost");
-        System.setProperty("https.proxyPort", "9999");
         HttpHeaders headers = new HttpHeaders();
         headers.set("User-Agent","Mozilla/5.0 (Windows NT 6.3; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/70.0.3538.102 Safari/537.36");
         // 判断redis中是否存着对应的Cookie
@@ -96,10 +92,6 @@ public class LibraryUtil {
      * @return void
      **/
     public static List<LibraryBook> getHistoryBooks(long uid){
-        System.setProperty("http.proxyHost", "localhost");
-        System.setProperty("http.proxyPort", "9999");
-        System.setProperty("https.proxyHost", "localhost");
-        System.setProperty("https.proxyPort", "9999");
         HttpHeaders headers = new HttpHeaders();
         headers.set("User-Agent","Mozilla/5.0 (Windows NT 6.3; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/70.0.3538.102 Safari/537.36");
         // 判断redis中是否存着对应的Cookie
@@ -209,10 +201,6 @@ public class LibraryUtil {
      * @return void
      **/
     public static BookSearchVO bookSearch(String title, int curPage){
-        System.setProperty("http.proxyHost", "localhost");
-        System.setProperty("http.proxyPort", "9999");
-        System.setProperty("https.proxyHost", "localhost");
-        System.setProperty("https.proxyPort", "9999");
         HttpHeaders headers = new HttpHeaders();
         headers.set("User-Agent","Mozilla/5.0 (Windows NT 6.3; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/70.0.3538.102 Safari/537.36");
         headers.set("Content-Type","application/x-www-form-urlencoded;charset=gb2312");
@@ -311,10 +299,6 @@ public class LibraryUtil {
      * @return com.lixingyong.meneusoft.modules.xcx.vo.DetailBookVO
      **/
     public static DetailBookVO detailBook(String detailId) {
-        System.setProperty("http.proxyHost", "localhost");
-        System.setProperty("http.proxyPort", "9999");
-        System.setProperty("https.proxyHost", "localhost");
-        System.setProperty("https.proxyPort", "9999");
         HttpHeaders headers = new HttpHeaders();
         headers.set("User-Agent","Mozilla/5.0 (Windows NT 6.3; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/70.0.3538.102 Safari/537.36");
         // 判断redis中是否存着对应的Cookie

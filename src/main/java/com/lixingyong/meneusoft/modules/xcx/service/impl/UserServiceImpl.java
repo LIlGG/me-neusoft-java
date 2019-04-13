@@ -74,16 +74,16 @@ public class UserServiceImpl extends ServiceImpl<UserDao, User> implements UserS
 
 
     @Override
-    public void insertOrUpdateJwcAccount(String user_id, String student_id, String password, String code) {
+    public void insertOrUpdateJwcAccount(String user_id, String student_id, String password, String code) throws WSExcetpion {
         // 判断当前教务处账号是否可用
         boolean usable = BindUtil.accountStatus(user_id,student_id, password, code, Type.JWC);
         if(usable){
-            User user = new User();
-            user.setId(Integer.valueOf(user_id));
+            User user = getUserInfo(Integer.valueOf(user_id));
             user.setJwcStudentId(student_id);
             user.setJwcPassword(password);
             user.setJwcVerify(1);
             this.insertOrUpdate(user);
+            return;
         }
         throw new WSExcetpion("教务处账号或密码不正确");
     }
@@ -94,6 +94,22 @@ public class UserServiceImpl extends ServiceImpl<UserDao, User> implements UserS
         user.setId(Integer.valueOf(userId));
         user.setEcardId(id);
         this.insertOrUpdate(user);
+    }
+
+    @Override
+    public void insertOrUpdateUfsAccount(String account, String password, String userId) throws WSExcetpion{
+        // 判断当前账号是否可用
+        boolean usable = BindUtil.accountStatus(userId, account, password, null, Type.Bind);
+        // 保存当前账号
+        if(usable){
+            User user = getUserInfo(Integer.valueOf(userId));
+            user.setStudentId(account);
+            user.setPassword(password);
+            user.setVerify(1);
+            this.insertOrUpdate(user);
+            return;
+        }
+        throw new WSExcetpion("无法登录至UFS系统");
     }
 
 }
