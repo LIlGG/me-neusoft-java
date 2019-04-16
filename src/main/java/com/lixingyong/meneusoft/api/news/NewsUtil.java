@@ -101,7 +101,6 @@ public class NewsUtil {
                         detail.setTitle(lis.get(i).select("a").first().text());
                         detail.setContent("");
                         detail.setAuthor("");
-                        detail.setContent("");
                         detail.setCategory(tagName);
                         String cDate = lis.get(i).select("i").first().text();
                         String nian = cDate.substring(0, cDate.indexOf("年"));

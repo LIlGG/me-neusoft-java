@@ -3,6 +3,7 @@ package com.lixingyong.meneusoft.api.evaluate.util;
 import com.lixingyong.meneusoft.api.evaluate.EISID;
 import com.lixingyong.meneusoft.api.evaluate.EvaluateAPI;
 import com.lixingyong.meneusoft.api.evaluate.VO.ValuationTaskVO;
+import org.springframework.lang.Nullable;
 
 import java.util.Objects;
 
@@ -11,7 +12,7 @@ public class ValuationUtil {
         String targetUrl = "";
         if(EISID.fromTypeName(taskVO.getPEisId()) == EISID.EIS_SU){
             if(taskVO.getVersionNo() == 2){
-                targetUrl = "/ValItemsAction.action?method=querySuValRecordV2&";
+                targetUrl = "/ValItemsAction.action?method={requestType}SuValRecord{isDetail}V2&";
             }else{
                 targetUrl = "/view/jsp/valuation/valitems.jsp?";
             }
@@ -22,7 +23,7 @@ public class ValuationUtil {
                     break;
                 case EIS_JC:
                     if(taskVO.getVersionNo() == 2){
-                        targetUrl = "/ValItemsAction.action?method=queryJcValRecordV3&";
+                        targetUrl = "/ValItemsAction.action?method={requestType}JcValRecord{isDetail}V3&";
                     } else {
                         targetUrl = "/view/jsp/valuation/valitemsJc.jsp?";
                     }
@@ -37,11 +38,19 @@ public class ValuationUtil {
                     targetUrl = "/view/jsp/valuation/valitemsTxm.jsp?";
                     break;
                 case EIS_MD:
-                    targetUrl = "/ValItemsAction.action?method=queryMdValRecordV2&";
+                    targetUrl = "/ValItemsAction.action?method={requestType}MdValRecord{isDetail}V2&";
                     break;
             }
         }
         taskVO.setUrl(EvaluateAPI.EVALUATE_HOME + targetUrl + EvaluateAPI.TASK_SUFFIX);
         return taskVO.getUrl();
+    }
+
+    public static String taskTargetUrl(@Nullable String eisId, String pEisId,@Nullable int version){
+        ValuationTaskVO taskVO = new ValuationTaskVO();
+        taskVO.setEisId(eisId);
+        taskVO.setPEisId(pEisId);
+        taskVO.setVersionNo(version);
+        return taskTargetUrl(taskVO);
     }
 }

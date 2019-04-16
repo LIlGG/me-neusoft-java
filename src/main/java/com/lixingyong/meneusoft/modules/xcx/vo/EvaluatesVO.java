@@ -12,5 +12,6 @@ public class EvaluatesVO {
     private String name;
     private String pEisId;
     private String eisId;
+    private int version;
     private List<TaskListVO> value;
 }

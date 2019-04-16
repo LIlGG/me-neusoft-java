@@ -1,18 +1,13 @@
 package com.lixingyong.meneusoft.api.evaluate;
 
-import com.google.gson.Gson;
-import com.lixingyong.meneusoft.api.evaluate.VO.EvaluateVO;
-import com.lixingyong.meneusoft.api.evaluate.VO.TaskListVO;
-import com.lixingyong.meneusoft.api.evaluate.VO.ValuationTaskVO;
-import com.lixingyong.meneusoft.api.evaluate.util.ValuationUtil;
-import com.lixingyong.meneusoft.api.jwc.JWCAPI;
+import com.lixingyong.meneusoft.api.evaluate.VO.*;
 import com.lixingyong.meneusoft.api.utils.RestUtils;
-import com.lixingyong.meneusoft.api.vpn.VPNAPI;
 import com.lixingyong.meneusoft.common.exception.WSExcetpion;
 import com.lixingyong.meneusoft.common.utils.RedisUtils;
 import com.lixingyong.meneusoft.modules.xcx.entity.User;
 import com.lixingyong.meneusoft.modules.xcx.service.UserService;
-import io.swagger.models.auth.In;
+import com.lixingyong.meneusoft.modules.xcx.vo.Evaluate;
+import com.lixingyong.meneusoft.modules.xcx.vo.EvaluatesVO;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
@@ -169,6 +164,8 @@ public class EvaluateUtil {
         cookies.add(cookie);
         headers.put(HttpHeaders.COOKIE,cookies); //将Cookies放入Header
         HttpEntity request = new HttpEntity<>(null,headers);//将参数和header组成一个请求
+        map.put("requestType", "query");
+        map.put("isDetail", "");
         map.put("eisId", valuationTaskVO.getEisId());
         map.put("yearNo", valuationTaskVO.getAcademicYearNo());
         map.put("termNo", valuationTaskVO.getTermNo());
@@ -204,5 +201,115 @@ public class EvaluateUtil {
             taskListVOS.add(taskListVO);
         }
         return taskListVOS;
+    }
+
+    /**
+     * 获取问题列表
+     * @param evaluatesVO
+     * @param url
+     * @param taskId
+     */
+    public static Evaluate getTaskIssue(EvaluatesVO evaluatesVO, String url, int taskId, Long userId) throws WSExcetpion {
+        loginVail(userId);
+        HttpHeaders headers = new HttpHeaders();
+        //登录前首先获取本次登录所需cookie
+        String cookie = redisUtils.get(userId+"UFS_COOKIE");
+        // 将cookie放入header
+        List<String> cookies = new ArrayList<>();
+        cookies.add(cookie);
+        headers.put(HttpHeaders.COOKIE,cookies); //将Cookies放入Header
+        HttpEntity request = new HttpEntity<>(null,headers);//将参数和header组成一个请求
+        map.put("requestType", "query");
+        map.put("isDetail", "Detail");
+        map.put("eisId", evaluatesVO.getEisId());
+        map.put("yearNo", evaluatesVO.getYear());
+        map.put("termNo", evaluatesVO.getTerm());
+        map.put("taskId", taskId);
+        ResponseEntity<String> response = restTemplate.exchange(url,HttpMethod.GET, request, String.class, map);
+        if(response.getStatusCode().is2xxSuccessful()){
+            String html = response.getBody();
+            if(html.contains("您没有权限访问本页面")){
+                //删除cookie，重新登录
+                redisUtils.delete(userId+"UFS_COOKIE");
+                getTaskIssue(evaluatesVO, url, taskId, userId);
+            }
+            Document document =  Jsoup.parse(html);
+            Element frmValRecords = document.select("#frmValRecords").first();
+            Elements valRecords =  frmValRecords.select(".valRecord");
+            Evaluate evaluate = new Evaluate();
+            List<QuestionVO> questions =  getQuestions(valRecords);
+            List<HiddenInput> hiddenInputs = getHiddens(frmValRecords);
+            evaluate.setItems(questions);
+            evaluate.setHiddlers(hiddenInputs);
+            return evaluate;
+        }
+        return null;
+    }
+
+    private static List<HiddenInput> getHiddens(Element frmValRecords) {
+        List<HiddenInput> hiddens = new LinkedList<>();
+        Elements hiddenInputs = frmValRecords.select("input[type=hidden]");
+        for(Element input : hiddenInputs){
+            HiddenInput hiddenInput = new HiddenInput();
+            hiddenInput.setName(input.attr("name"));
+            hiddenInput.setValue(input.attr("value"));
+            hiddens.add(hiddenInput);
+        }
+        return hiddens;
+    }
+
+    private static List<QuestionVO> getQuestions(Elements valRecords) {
+        List<QuestionVO> questions = new LinkedList<>();
+        // 处理查找出来的数据
+        for(Element valRecord : valRecords){
+            QuestionVO  question = new QuestionVO();
+            Element panel =  valRecord.select(".panel-body").first();
+            if(panel.children().hasClass("radio-inline")){
+                // 这时当前valRecord就是选择题
+                // 选择题先保存所有的选项
+                List<RadioVO> radios = new LinkedList<>();
+                String name  = questionRadios(panel.children(), radios);
+                question.setRadios(radios);
+                question.setName(name);
+                question.setType("radio");
+            } else if(panel.children().hasClass("form-control")){
+                // 这时就是简答
+                // 简答题直接保存问题即可
+                String name = panel.children().first().attr("name");
+                question.setName(name);
+                question.setType("textarea");
+            }
+            String[] names = valRecord.select(".panel-heading").text().split("、");
+            StringBuilder name = new StringBuilder();
+            for(int i = 1; i < names.length; i++){
+                name.append(names[i]);
+                if(i != names.length - 1){
+                    name.append("、");
+                }
+            }
+            question.setTitle(name.toString());
+            questions.add(question);
+        }
+        return questions;
+    }
+
+    private static String questionRadios(Elements labels, List<RadioVO> radios) {
+        for(Element label : labels){
+            RadioVO radioVO = new RadioVO();
+            Element radio = label.select("input").first();
+            String[] radioInput = label.text().split("、");
+            radioVO.setValue(radioInput[0].equals("")?radio.attr("value"): radioInput[0]);
+            StringBuilder name = new StringBuilder();
+            for(int i = 1; i < radioInput.length; i++){
+                name.append(radioInput[i]);
+                if(i != radioInput.length - 1){
+                    name.append("、");
+                }
+            }
+            radioVO.setName(name.toString());
+            radioVO.setChecked(false);
+            radios.add(radioVO);
+        }
+        return labels.first().select("input").first().attr("name");
     }
 }
