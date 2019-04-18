@@ -16,8 +16,8 @@ import java.util.List;
  * @Date 2018/12/11 11:26
  * @Version 1.0
  */
-@RestController
 @Api("通知")
+@RestController
 public class NoticesController {
     @Autowired
     private NoticeService noticeService;
@@ -52,11 +52,4 @@ public class NoticesController {
         return R.error(502,"无最新公告");
     }
 
-    @GetMapping(value = "/tests")
-    public void getTests(){
-        Notice notice = new Notice();
-        notice.setTitle("测试");
-        notice.setContent("内容");
-        noticeService.addNotice(notice);
-    }
 }

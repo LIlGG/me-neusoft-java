@@ -21,22 +21,23 @@ import java.util.List;
  * @Date 2018/12/12 15:13
  * @Version 1.0
  */
-@RestController
+
 @Api("通讯录")
+@RestController("/contact")
 public class ContactController {
     @Autowired
     private ContactCategoryService contactCategoryService;
     @Autowired
     private ContactBookService contactBookService;
     @ApiOperation("获取通讯录类别")
-    @RequestMapping("/contact/categories")
+    @RequestMapping("/categories")
     public R getCategories(){
         List<ContactCategory> categoryList = contactCategoryService.getCategories();
         return R.ok(categoryList);
     }
 
     @ApiOperation("获取详细通讯录信息")
-    @RequestMapping("/contact/item/{categoryId}")
+    @RequestMapping("/item/{categoryId}")
     public R getContactBooks(@PathVariable("categoryId") int id){
         List<ContactBook> contactBooks = contactBookService.getContactBooks(id);
         return R.ok(contactBooks);

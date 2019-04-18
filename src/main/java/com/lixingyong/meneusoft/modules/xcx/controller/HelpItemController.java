@@ -13,8 +13,8 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
 
-@RestController
 @Api("用户帮助")
+@RestController
 public class HelpItemController {
     @Autowired
     private HelpItemService helpItemService;

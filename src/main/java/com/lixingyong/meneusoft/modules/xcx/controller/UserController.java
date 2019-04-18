@@ -37,8 +37,8 @@ import java.util.Map;
  * @Date 2018/12/12 15:25
  * @Version 1.0
  */
-@RestController
 @Api("用户")
+@RestController
 public class UserController {
     @Autowired
     private WechatService wechatService;

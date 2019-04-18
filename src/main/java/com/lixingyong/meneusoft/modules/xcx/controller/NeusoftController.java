@@ -18,8 +18,8 @@ import org.springframework.web.bind.annotation.RestController;
  * @Date 2019-03-05 20:32
  */
 
+@Api("其余配置")
 @RestController
-@Api("微信安全控制接口")
 public class NeusoftController {
     /**
      * @Author lixingyong

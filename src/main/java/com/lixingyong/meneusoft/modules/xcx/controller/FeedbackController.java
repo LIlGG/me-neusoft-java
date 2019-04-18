@@ -17,9 +17,8 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.Map;
-
-@RestController
 @Api("用户反馈")
+@RestController
 public class FeedbackController {
     @Autowired
     private FeedbackService feedbackService;

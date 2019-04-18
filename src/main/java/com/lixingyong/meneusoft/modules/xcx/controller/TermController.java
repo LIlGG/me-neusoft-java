@@ -13,8 +13,8 @@ import org.springframework.web.bind.annotation.RestController;
  * @Date 2018/12/12 15:58
  * @Version 1.0
  */
-@RestController
 @Api("校历")
+@RestController
 public class TermController {
 
     @ApiOperation("获取当前学期")

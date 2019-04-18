@@ -11,6 +11,7 @@ import com.lixingyong.meneusoft.modules.xcx.service.UserLibraryService;
 import com.lixingyong.meneusoft.modules.xcx.vo.BookSearchVO;
 import com.lixingyong.meneusoft.modules.xcx.vo.DetailBookVO;
 import io.micrometer.core.instrument.search.Search;
+import io.swagger.annotations.Api;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -23,8 +24,8 @@ import java.util.Map;
  * @Author mail@lixingyong.com
  * @Date 2019-03-18 11:59
  */
-@RestController
-@RequestMapping("/library")
+@Api("图书馆")
+@RestController("/library")
 public class LibraryController {
     @Autowired
     private LibraryBookService libraryBookService;

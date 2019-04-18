@@ -20,8 +20,8 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
-@RestController
 @Api("快捷评教")
+@RestController
 public class EvaluateController {
 
     @ApiOperation("获取评教列表")
@@ -77,7 +77,6 @@ public class EvaluateController {
         }
         return R.error("获取评教问题失败");
     }
-
 
     /**
      * 用户提交的评教信息

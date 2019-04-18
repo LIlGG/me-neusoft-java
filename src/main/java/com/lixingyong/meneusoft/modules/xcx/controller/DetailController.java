@@ -24,8 +24,8 @@ import java.util.Map;
  * @Date 2018/12/12 15:13
  * @Version 1.0
  */
-@RestController
 @Api("资讯")
+@RestController
 public class DetailController {
     @Autowired
     private DetailService detailService;
