@@ -18,7 +18,8 @@ import org.springframework.web.bind.annotation.RestController;
 import java.util.LinkedList;
 import java.util.List;
 @Api("一卡通")
-@RestController("/ecard")
+@RestController
+@RequestMapping("/ecard")
 public class EcardController {
     @Autowired
     private EcardService ecardService;

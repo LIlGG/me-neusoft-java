@@ -20,6 +20,8 @@ public class TermController {
     @ApiOperation("获取当前学期")
     @GetMapping("/term")
     public R term(){
+        // 初次更新教务系统的校历信息
+        
         return null;
     }
 

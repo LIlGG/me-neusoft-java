@@ -27,11 +27,12 @@ public class ScheduledController {
     }
 
     /**
-     * 定时更新讲座信息（一天更新一次，更新时间为下午16点）
+     * 定时更新讲座信息（一天更新一次，更新时间为每天12点）
      */
+    @Scheduled(cron = "0 0 12 * * ?")
     public void getLectureData(){
         log.info("执行更新讲座信息");
-        
+        scheduledService.getLectures();
         log.info("结束更新讲座信息");
     }
 }

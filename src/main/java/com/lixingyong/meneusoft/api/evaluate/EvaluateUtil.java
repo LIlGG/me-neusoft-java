@@ -40,6 +40,7 @@ public class EvaluateUtil {
         if(responseEntity.getStatusCode().is2xxSuccessful()){
             // 获取cookie
             List<String> cookies = responseEntity.getHeaders().get("Set-Cookie");
+            System.out.println(cookies);
             if(!cookies.isEmpty()){
                 return cookies.get(0).split(";")[0];
             }

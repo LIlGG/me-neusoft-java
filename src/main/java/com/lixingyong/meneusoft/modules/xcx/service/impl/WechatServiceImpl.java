@@ -53,9 +53,9 @@ public class WechatServiceImpl extends ServiceImpl<WechatDao, Wechat> implements
         wechat.setNickName(jsonObject.get("nickName").toString());
         wechat.setAvatarUrl(jsonObject.get("avatarUrl").toString());
         if(Integer.valueOf(jsonObject.get("gender").toString()) == 0){
-            wechat.setGender("男");
-        }else{
             wechat.setGender("女");
+        }else{
+            wechat.setGender("男");
         }
 
         this.insert(wechat);

@@ -25,7 +25,8 @@ import java.util.Map;
  * @Date 2019-03-18 11:59
  */
 @Api("图书馆")
-@RestController("/library")
+@RestController
+@RequestMapping("/library")
 public class LibraryController {
     @Autowired
     private LibraryBookService libraryBookService;

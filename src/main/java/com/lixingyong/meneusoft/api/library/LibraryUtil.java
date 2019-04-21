@@ -41,7 +41,7 @@ public class LibraryUtil {
     private static RestTemplate restTemplate = RestUtils.getRestTemplate();
     private static RedisUtils redisUtils = RestUtils.getRedisUtils();
     private static Map<String,Object> map = new HashMap<>();
-    private static Logger logger = LoggerFactory.getLogger(VPNUtil.class);
+    private static Logger logger = LoggerFactory.getLogger(LibraryUtil.class);
     /**
      * @Author lixingyong
      * @Description //TODO 登录图书馆

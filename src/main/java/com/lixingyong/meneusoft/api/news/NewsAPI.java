@@ -12,4 +12,7 @@ public final class NewsAPI {
 
     /** 新闻中心新闻页面 */
     public static final String NEWS = NEWS_HOME + "news/";
+
+    /** 学术讲座通知页面 */
+    public static final String LECTURE = NEWS + "event/lecture/";
 }

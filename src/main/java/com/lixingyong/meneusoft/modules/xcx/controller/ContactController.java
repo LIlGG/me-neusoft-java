@@ -23,7 +23,8 @@ import java.util.List;
  */
 
 @Api("通讯录")
-@RestController("/contact")
+@RestController
+@RequestMapping("/contact")
 public class ContactController {
     @Autowired
     private ContactCategoryService contactCategoryService;

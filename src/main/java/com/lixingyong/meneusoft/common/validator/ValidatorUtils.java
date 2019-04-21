@@ -36,7 +36,8 @@ public class ValidatorUtils {
         if (!constraintViolations.isEmpty()) {
             StringBuilder msg = new StringBuilder();
             for(ConstraintViolation<Object> constraint:  constraintViolations){
-                msg.append(constraint.getMessage()).append("<br>");
+                msg.append(constraint.getMessage());
+                break;
             }
             throw new WSExcetpion(msg.toString());
         }
