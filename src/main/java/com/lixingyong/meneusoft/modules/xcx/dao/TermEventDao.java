@@ -1,0 +1,10 @@
+package com.lixingyong.meneusoft.modules.xcx.dao;
+
+import com.baomidou.mybatisplus.mapper.BaseMapper;
+import com.lixingyong.meneusoft.modules.xcx.entity.Term;
+import com.lixingyong.meneusoft.modules.xcx.entity.TermEvent;
+import org.apache.ibatis.annotations.Mapper;
+
+@Mapper
+public interface TermEventDao extends BaseMapper<TermEvent> {
+}

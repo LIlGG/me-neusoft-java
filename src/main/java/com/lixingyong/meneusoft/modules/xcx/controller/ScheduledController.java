@@ -35,4 +35,15 @@ public class ScheduledController {
         scheduledService.getLectures();
         log.info("结束更新讲座信息");
     }
+
+    /**
+     * 定时更新校历（每月月初更新一次，更新时间为晚上0点整）
+     */
+    @Scheduled(cron = "0 0 0 1 * ?")
+    public void getTermData(){
+        log.info("执行更新校历信息");
+        scheduledService.getTerms();
+        log.info("结束更新校历信息");
+    }
+
 }

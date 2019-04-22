@@ -4,4 +4,7 @@ public interface ScheduledService {
     void getContactBooksAndTeachers();
 
     void getLectures();
+
+    void getTerms();
+
 }
