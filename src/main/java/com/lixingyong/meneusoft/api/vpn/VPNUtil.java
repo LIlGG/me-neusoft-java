@@ -1,6 +1,6 @@
 package com.lixingyong.meneusoft.api.vpn;
 
-import com.lixingyong.meneusoft.api.utils.RestUtils;
+import com.lixingyong.meneusoft.api.RestConfig;
 import com.lixingyong.meneusoft.common.exception.WSExcetpion;
 import com.lixingyong.meneusoft.common.utils.RedisUtils;
 import org.slf4j.Logger;
@@ -23,8 +23,8 @@ import java.util.List;
  */
 
 public class  VPNUtil {
-    private static RestTemplate restTemplate = RestUtils.getRestTemplate();
-    private static RedisUtils redisUtils = RestUtils.getRedisUtils();
+    private static RestTemplate restTemplate = RestConfig.getRestTemplate();
+    private static RedisUtils redisUtils = RestConfig.getRedisUtils();
     private static Logger logger = LoggerFactory.getLogger(VPNUtil.class);
 
     /**

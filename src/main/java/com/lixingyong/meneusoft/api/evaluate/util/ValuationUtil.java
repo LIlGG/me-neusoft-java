@@ -40,6 +40,12 @@ public class ValuationUtil {
                 case EIS_MD:
                     targetUrl = "/ValItemsAction.action?method={requestType}MdValRecord{isDetail}V2&";
                     break;
+                case EIS_GT:
+                    if(taskVO.getVersionNo() == 2){
+                        targetUrl = "/ValItemsAction.action?method={requestType}SuValRecord{isDetail}V2&";
+                    }else{
+                        targetUrl = "/view/jsp/valuation/valitems.jsp?";
+                    }
             }
         }
         taskVO.setUrl(EvaluateAPI.EVALUATE_HOME + targetUrl + EvaluateAPI.TASK_SUFFIX);

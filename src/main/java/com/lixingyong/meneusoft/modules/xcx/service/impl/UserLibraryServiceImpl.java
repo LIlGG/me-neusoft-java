@@ -44,7 +44,7 @@ public class UserLibraryServiceImpl extends ServiceImpl<UserLibraryDao, UserLibr
     }
 
     @Override
-    public void insertOrUpdateLibraryAccount(String userId, String student_id, String password) {
+    public void insertOrUpdateLibraryAccount(String userId, String student_id, String password) throws WSExcetpion {
         // 判断图书馆账号是否可以使用
         boolean usable =  BindUtil.accountStatus(userId, student_id, password,null,Type.LIBRARY);
         if(usable){

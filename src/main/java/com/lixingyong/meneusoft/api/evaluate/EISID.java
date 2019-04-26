@@ -1,7 +1,7 @@
 package com.lixingyong.meneusoft.api.evaluate;
 
 public enum EISID {
-    EIS_PT("PT"), EIS_JC("JC"), EIS_KC("KC"), EIS_MD("MD"), EIS_SU("SU"), EIS_TJC("TJC"), EIS_TKC("TKC"), EIS_TXM("TXM");
+    EIS_PT("PT"), EIS_JC("JC"), EIS_KC("KC"), EIS_MD("MD"), EIS_SU("SU"), EIS_TJC("TJC"), EIS_TKC("TKC"), EIS_TXM("TXM"), EIS_GT("GT");
     private String type;
     EISID(String type) {
         this.type = type;

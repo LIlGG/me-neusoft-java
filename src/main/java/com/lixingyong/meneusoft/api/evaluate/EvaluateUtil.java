@@ -1,7 +1,7 @@
 package com.lixingyong.meneusoft.api.evaluate;
 
 import com.lixingyong.meneusoft.api.evaluate.VO.*;
-import com.lixingyong.meneusoft.api.utils.RestUtils;
+import com.lixingyong.meneusoft.api.RestConfig;
 import com.lixingyong.meneusoft.common.exception.WSExcetpion;
 import com.lixingyong.meneusoft.common.utils.RedisUtils;
 import com.lixingyong.meneusoft.modules.xcx.entity.User;
@@ -23,10 +23,10 @@ import org.springframework.web.client.RestTemplate;
 import java.util.*;
 
 public class EvaluateUtil {
-    private static RestTemplate restTemplate = RestUtils.getRestTemplate();
-    private static RedisUtils redisUtils = RestUtils.getRedisUtils();
+    private static RestTemplate restTemplate = RestConfig.getRestTemplate();
+    private static RedisUtils redisUtils = RestConfig.getRedisUtils();
     private static Map<String,Object> map = new HashMap<>();
-    private static UserService userService = RestUtils.getUserService();
+    private static UserService userService = RestConfig.getUserService();
     /**
      * 获取会话cookie
      */
@@ -40,7 +40,6 @@ public class EvaluateUtil {
         if(responseEntity.getStatusCode().is2xxSuccessful()){
             // 获取cookie
             List<String> cookies = responseEntity.getHeaders().get("Set-Cookie");
-            System.out.println(cookies);
             if(!cookies.isEmpty()){
                 return cookies.get(0).split(";")[0];
             }
@@ -77,11 +76,11 @@ public class EvaluateUtil {
      */
     public static boolean ufsLogin(long userId, String account, String pw) {
         // 若cookie中存在当前cookie,则执行注销程序
-        if(redisUtils.hasKey(userId+"UFS_COOKIE")){
+        if(redisUtils.hasKey(userId+"EVALUATE_COOKIE")){
             // 执行注销程序
-            if(getCookie(redisUtils.get(userId+"UFS_COOKIE"))){
+            if(getCookie(redisUtils.get(userId+"EVALUATE_COOKIE"))){
                 // 清除redis保存的数据
-                redisUtils.delete(userId+"UFS_COOKIE");
+                redisUtils.delete(userId+"EVALUATE_COOKIE");
             }
         }
         //登录前首先获取本次登录所需cookie
@@ -99,7 +98,7 @@ public class EvaluateUtil {
         if(response.getStatusCode().is2xxSuccessful()){
             if((boolean)response.getBody().get("success")){
                 // 将当前cookie保存
-                redisUtils.set(userId+"UFS_COOKIE",cookie);
+                redisUtils.set(userId+"EVALUATE_COOKIE",cookie);
                 return true;
             }
         }
@@ -111,7 +110,7 @@ public class EvaluateUtil {
      */
     private static void loginVail(Long userId) throws WSExcetpion{
         // 若cookie中不存在cookie,则执行登录程序
-        if(!redisUtils.hasKey(userId+"UFS_COOKIE")){
+        if(!redisUtils.hasKey(userId+"EVALUATE_COOKIE")){
             User user = userService.getUserInfo(userId.intValue());
             if(user.getVerify() == 1){
                 if(!ufsLogin(userId, user.getStudentId(), user.getPassword())){
@@ -130,7 +129,7 @@ public class EvaluateUtil {
         loginVail(userId);
         HttpHeaders headers = new HttpHeaders();
         //登录前首先获取本次登录所需cookie
-        String cookie = redisUtils.get(userId+"UFS_COOKIE");
+        String cookie = redisUtils.get(userId+"EVALUATE_COOKIE");
         // 将cookie放入header
         List<String> cookies = new ArrayList<>();
         cookies.add(cookie);
@@ -142,7 +141,7 @@ public class EvaluateUtil {
            if(evaluateVO.getErrorMsg().length() > 0){
                if(evaluateVO.getErrorMsg().contains("您没有权限访问本页面")){
                    //删除cookie，重新登录
-                   redisUtils.delete(userId+"UFS_COOKIE");
+                   redisUtils.delete(userId+"EVALUATE_COOKIE");
                    evaluateVO = getEvaluates(userId);
                }
            }
@@ -159,7 +158,7 @@ public class EvaluateUtil {
         loginVail(userId);
         HttpHeaders headers = new HttpHeaders();
         //登录前首先获取本次登录所需cookie
-        String cookie = redisUtils.get(userId+"UFS_COOKIE");
+        String cookie = redisUtils.get(userId+"EVALUATE_COOKIE");
         // 将cookie放入header
         List<String> cookies = new ArrayList<>();
         cookies.add(cookie);
@@ -175,13 +174,18 @@ public class EvaluateUtil {
             String html = response.getBody();
             if(html.contains("您没有权限访问本页面")){
                 //删除cookie，重新登录
-                redisUtils.delete(userId+"UFS_COOKIE");
+                redisUtils.delete(userId+"EVALUATE_COOKIE");
                 getTaskList(userId, valuationTaskVO);
             }
             Document document =  Jsoup.parse(html);
-            Element tbody =  document.select(".table").first().select("tbody").first();
-            // 处理tbody
-            return taskTrs(tbody);
+
+            try {
+                Element tbody =  document.select(".table").first().select("tbody").first();
+                // 处理tbody
+                return taskTrs(tbody);
+            }catch (NullPointerException n){
+                return null;
+            }
         }
         return null;
     }
@@ -214,7 +218,7 @@ public class EvaluateUtil {
         loginVail(userId);
         HttpHeaders headers = new HttpHeaders();
         //登录前首先获取本次登录所需cookie
-        String cookie = redisUtils.get(userId+"UFS_COOKIE");
+        String cookie = redisUtils.get(userId+"EVALUATE_COOKIE");
         // 将cookie放入header
         List<String> cookies = new ArrayList<>();
         cookies.add(cookie);
@@ -231,7 +235,7 @@ public class EvaluateUtil {
             String html = response.getBody();
             if(html.contains("您没有权限访问本页面")){
                 //删除cookie，重新登录
-                redisUtils.delete(userId+"UFS_COOKIE");
+                redisUtils.delete(userId+"EVALUATE_COOKIE");
                 getTaskIssue(evaluatesVO, url, taskId, userId);
             }
             Document document =  Jsoup.parse(html);

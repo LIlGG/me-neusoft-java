@@ -1,8 +1,7 @@
 package com.lixingyong.meneusoft.api.contact;
 
-import com.lixingyong.meneusoft.api.utils.RestUtils;
+import com.lixingyong.meneusoft.api.RestConfig;
 import com.lixingyong.meneusoft.common.exception.WSExcetpion;
-import com.lixingyong.meneusoft.common.utils.RedisUtils;
 import com.lixingyong.meneusoft.modules.xcx.entity.ContactBook;
 import com.lixingyong.meneusoft.modules.xcx.entity.ContactCategory;
 import com.lixingyong.meneusoft.modules.xcx.entity.Teacher;
@@ -21,7 +20,7 @@ import java.util.List;
 import java.util.Objects;
 
 public class ContactUtil {
-    private static RestTemplate restTemplate = RestUtils.getRestTemplate();
+    private static RestTemplate restTemplate = RestConfig.getRestTemplate();
 
     public static List<Teacher> getContactBooksAndTeachers(ContactCategory contactCategory, List<ContactBook> contactBooks) throws WSExcetpion {
         HttpEntity<String> request = new HttpEntity<>(null, null);

@@ -1,6 +1,5 @@
 server:
   port: 8080
-
 management:
   endpoint:
     env:
@@ -42,6 +41,7 @@ spring:
         max-wait: -1ms
         max-idle: 10
         min-idle: 0
+
 wx:
   jwt:
     # 你的secret密匙

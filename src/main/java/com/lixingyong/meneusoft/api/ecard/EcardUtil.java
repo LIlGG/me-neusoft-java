@@ -1,5 +1,5 @@
 package com.lixingyong.meneusoft.api.ecard;
-import com.lixingyong.meneusoft.api.utils.RestUtils;
+import com.lixingyong.meneusoft.api.RestConfig;
 import com.lixingyong.meneusoft.common.utils.RedisUtils;
 import com.lixingyong.meneusoft.modules.xcx.entity.Ecard;
 import com.lixingyong.meneusoft.modules.xcx.service.EcardService;
@@ -26,10 +26,10 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class EcardUtil {
-    private static RestTemplate restTemplate = RestUtils.getRestTemplate();
-    private static RedisUtils redisUtils = RestUtils.getRedisUtils();
+    private static RestTemplate restTemplate = RestConfig.getRestTemplate();
+    private static RedisUtils redisUtils = RestConfig.getRedisUtils();
     private static Map<String,Object> map = new HashMap<>();
-    private static EcardService ecardService = RestUtils.getEcardService();
+    private static EcardService ecardService = RestConfig.getEcardService();
     private static Logger logger = LoggerFactory.getLogger(EcardUtil.class);
 
     public static void loginEcard(long uid, String ecardId) throws WSExcetpion {

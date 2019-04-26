@@ -35,9 +35,9 @@ public class LoginUtil{
     // 提供Fiddler拦截代理
     public static void fiddler(){
         System.setProperty("http.proxyHost", "localhost");
-        System.setProperty("http.proxyPort", "9999");
+        System.setProperty("http.proxyPort", "8888");
         System.setProperty("https.proxyHost", "localhost");
-        System.setProperty("https.proxyPort", "9999");
+        System.setProperty("https.proxyPort", "8888");
     }
     // 仅连接VPN
     public static boolean exeVpnLogin() throws WSExcetpion{

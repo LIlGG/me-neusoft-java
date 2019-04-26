@@ -1,7 +1,7 @@
 package com.lixingyong.meneusoft.api.github;
 
 import com.google.gson.Gson;
-import com.lixingyong.meneusoft.api.utils.RestUtils;
+import com.lixingyong.meneusoft.api.RestConfig;
 import com.lixingyong.meneusoft.common.exception.WSExcetpion;
 import com.lixingyong.meneusoft.modules.xcx.vo.Issue;
 import org.springframework.http.*;
@@ -12,9 +12,9 @@ import java.util.*;
 
 
 public class GitHubUtil {
-    private static RestTemplate restTemplate = RestUtils.getRestTemplate();
+    private static RestTemplate restTemplate = RestConfig.getRestTemplate();
     /** githubToken */
-    private static String token = RestUtils.getToken();
+    private static String token = RestConfig.getToken();
 
     public static int createdIssues(String title, String body, String[] lables){
         // 创建Header

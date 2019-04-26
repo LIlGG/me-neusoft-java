@@ -2,10 +2,7 @@ package com.lixingyong.meneusoft.api.neusoft;
 
 import com.google.gson.Gson;
 import com.google.gson.internal.LinkedTreeMap;
-import com.lixingyong.meneusoft.api.github.GitHubAPI;
-import com.lixingyong.meneusoft.api.library.LibraryAPI;
-import com.lixingyong.meneusoft.api.utils.RestUtils;
-import com.lixingyong.meneusoft.api.vpn.VPNAPI;
+import com.lixingyong.meneusoft.api.RestConfig;
 import com.lixingyong.meneusoft.common.utils.DateUtils;
 import com.lixingyong.meneusoft.common.utils.RedisUtils;
 import com.lixingyong.meneusoft.modules.xcx.entity.Term;
@@ -14,7 +11,6 @@ import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
-import org.springframework.core.io.Resource;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
@@ -28,8 +24,8 @@ import java.util.*;
  * 其他所有类型的教学系统请求
  */
 public class NeusoftUtil {
-    private static RestTemplate restTemplate = RestUtils.getRestTemplate();
-    private static RedisUtils redisUtils = RestUtils.getRedisUtils();
+    private static RestTemplate restTemplate = RestConfig.getRestTemplate();
+    private static RedisUtils redisUtils = RestConfig.getRedisUtils();
     private static Map<String,Object> map = new HashMap<>();
     /**
      * 获取校历列表请求（需登录VPN）

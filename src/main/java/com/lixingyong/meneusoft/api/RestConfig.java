@@ -1,25 +1,30 @@
-package com.lixingyong.meneusoft.api.utils;
+package com.lixingyong.meneusoft.api;
 
+import com.lixingyong.meneusoft.common.config.MyCookieStore;
 import com.lixingyong.meneusoft.common.config.MyRedirectStrategy;
 import com.lixingyong.meneusoft.common.utils.RedisUtils;
 import com.lixingyong.meneusoft.modules.xcx.service.EcardService;
 import com.lixingyong.meneusoft.modules.xcx.service.TagService;
 import com.lixingyong.meneusoft.modules.xcx.service.UserService;
-import org.apache.http.HttpRequestFactory;
+import org.apache.http.HttpHost;
 import org.apache.http.client.HttpClient;
+import org.apache.http.client.params.ClientPNames;
+import org.apache.http.client.params.CookiePolicy;
+import org.apache.http.impl.client.BasicCookieStore;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.impl.client.LaxRedirectStrategy;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.client.ClientHttpRequestFactory;
 import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
 import org.springframework.http.client.SimpleClientHttpRequestFactory;
+import org.springframework.http.converter.FormHttpMessageConverter;
 import org.springframework.http.converter.HttpMessageConverter;
 import org.springframework.http.converter.StringHttpMessageConverter;
+import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
 
-import java.nio.charset.StandardCharsets;
+import java.nio.charset.Charset;
 import java.util.List;
 
 /**
@@ -29,7 +34,7 @@ import java.util.List;
  * @Date 2019-03-21 19:01
  */
 @Component
-public class RestUtils {
+public class RestConfig {
     private static RestTemplate restTemplate;
     private static RedisUtils redisUtils;
     private static TagService tagService;
@@ -54,20 +59,28 @@ public class RestUtils {
     private void setRestTemplate(RestTemplate restTemplate){
         List<HttpMessageConverter<?>> converters = restTemplate.getMessageConverters();
         converters.remove(1);
-        HttpMessageConverter<?> converter = new StringHttpMessageConverter(StandardCharsets.UTF_8);
-        converters.add(1,converter);
+        HttpMessageConverter<?> converter = new StringHttpMessageConverter(Charset.forName("UTF-8"));
+        FormHttpMessageConverter fc = new FormHttpMessageConverter();
+        MappingJackson2HttpMessageConverter mc = new MappingJackson2HttpMessageConverter();
+        fc.setCharset(Charset.forName("GBK"));
+        converters.add(1,fc);
+        converters.add(2,converter);
+        converters.add(3,mc);
         /** 设置超时时间 */
-//        SimpleClientHttpRequestFactory simpleClientHttpRequestFactory = new SimpleClientHttpRequestFactory();
-//        simpleClientHttpRequestFactory.setConnectTimeout(60 * 1000);
-//        simpleClientHttpRequestFactory.setReadTimeout(60 * 1000);
-//
+        SimpleClientHttpRequestFactory simpleClientHttpRequestFactory = new SimpleClientHttpRequestFactory();
+        simpleClientHttpRequestFactory.setConnectTimeout(60 * 1000);
+        simpleClientHttpRequestFactory.setReadTimeout(60 * 1000);
         HttpClient httpClient = HttpClientBuilder.create()
-                .setRedirectStrategy(new MyRedirectStrategy())
+                .setRedirectStrategy(new LaxRedirectStrategy())
+//                .setProxy(new HttpHost("127.0.0.1",8888))
+                .setDefaultCookieStore(new MyCookieStore())
                 .build();
+
         HttpComponentsClientHttpRequestFactory httpRequestFactory = new HttpComponentsClientHttpRequestFactory();
         httpRequestFactory.setConnectTimeout(30 * 1000);
         httpRequestFactory.setReadTimeout(30 * 1000);
         httpRequestFactory.setHttpClient(httpClient);
+
         restTemplate.setMessageConverters(converters);
         restTemplate.setRequestFactory(httpRequestFactory);
         this.restTemplate = restTemplate;

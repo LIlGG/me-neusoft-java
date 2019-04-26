@@ -1,8 +1,7 @@
 package com.lixingyong.meneusoft.api.library;
 
-import com.lixingyong.meneusoft.api.utils.RestUtils;
+import com.lixingyong.meneusoft.api.RestConfig;
 import com.lixingyong.meneusoft.api.vpn.VPNAPI;
-import com.lixingyong.meneusoft.api.vpn.VPNUtil;
 import com.lixingyong.meneusoft.common.exception.WSExcetpion;
 import com.lixingyong.meneusoft.common.utils.DateUtils;
 import com.lixingyong.meneusoft.common.utils.RedisUtils;
@@ -17,13 +16,8 @@ import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.Resource;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpMethod;
-import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Component;
+import org.springframework.http.*;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
@@ -38,8 +32,8 @@ import java.util.*;
  * @Date 2019-03-16 15:23
  */
 public class LibraryUtil {
-    private static RestTemplate restTemplate = RestUtils.getRestTemplate();
-    private static RedisUtils redisUtils = RestUtils.getRedisUtils();
+    private static RestTemplate restTemplate = RestConfig.getRestTemplate();
+    private static RedisUtils redisUtils = RestConfig.getRedisUtils();
     private static Map<String,Object> map = new HashMap<>();
     private static Logger logger = LoggerFactory.getLogger(LibraryUtil.class);
     /**
@@ -51,7 +45,7 @@ public class LibraryUtil {
      **/
     public static void libraryLogin(long uid, String barcode, String password){
         HttpHeaders headers = new HttpHeaders();
-        headers.set("User-Agent","Mozilla/5.0 (Windows NT 6.3; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/70.0.3538.102 Safari/537.36");
+        headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
         // 判断redis中是否存着对应的Cookie
         if(!redisUtils.hasKey("SVPNCOOKIE")){
             throw new WSExcetpion("redis中数据不完善");
@@ -81,7 +75,7 @@ public class LibraryUtil {
                 }
             }
         }
-        throw new WSExcetpion("获取教务处登录信息失败");
+        throw new WSExcetpion("获取图书馆登录信息失败");
     }
 
     /**

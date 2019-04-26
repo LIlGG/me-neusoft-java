@@ -1,6 +1,7 @@
 package com.lixingyong.meneusoft.modules.xcx.controller;
 
 import com.google.gson.Gson;
+import com.lixingyong.meneusoft.api.evaluate.EISID;
 import com.lixingyong.meneusoft.api.evaluate.EvaluateUtil;
 import com.lixingyong.meneusoft.api.evaluate.VO.EvaluateVO;
 import com.lixingyong.meneusoft.api.evaluate.VO.HiddenInput;
@@ -39,7 +40,7 @@ public class EvaluateController {
                 // 获取当前评教列表
                 ValuationUtil.taskTargetUrl(valuationTaskVO);
                 List<TaskListVO> taskListVOS = EvaluateUtil.getTaskList(Long.parseLong(userId), valuationTaskVO);
-                if(!taskListVOS.isEmpty()){
+                if(taskListVOS!=null){
                     evaluatesVO.setEisId(valuationTaskVO.getEisId());
                     evaluatesVO.setPEisId(valuationTaskVO.getPEisId());
                     evaluatesVO.setYear(valuationTaskVO.getAcademicYearNo());
@@ -48,6 +49,8 @@ public class EvaluateController {
                     evaluatesVO.setValue(taskListVOS);
                     evaluatesVO.setVersion(valuationTaskVO.getVersionNo());
                     result.add(evaluatesVO);
+                } else if(valuationTaskVO.getEisId().equals(EISID.EIS_GT.getType())){
+                    continue;
                 }
             }
         }

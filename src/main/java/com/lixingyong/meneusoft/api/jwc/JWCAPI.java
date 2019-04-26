@@ -12,14 +12,14 @@ public final class JWCAPI {
     public final static String JWCAPI = "http/newjw.neusoft.edu.cn";
 
     /** 获取Session_Id */
-    public final static String JWCSID = JWCAPI + "/jwweb/";
+    public final static String JWCSID = JWCAPI + "/jwweb";
 
     /** 获取验证码 */
-    public final static String CODE = JWCSID + "sys/ValidateCode.aspx";
+    public final static String CODE = JWCSID + "/sys/ValidateCode.aspx";
 
     /** 登录接口 */
-    public final static String LOGIN = JWCSID + "_data/home_login.aspx";
+    public final static String LOGIN = JWCSID + "/_data/home_login.aspx";
 
     /** 教务处学业基本信息快查 */
-    public final static String XYJZQK = JWCSID + "xsxj/Stu_xyjzqk_rpt.aspx";
+    public final static String XYJZQK = JWCSID + "/xsxj/Stu_xyjzqk_rpt.aspx";
 }

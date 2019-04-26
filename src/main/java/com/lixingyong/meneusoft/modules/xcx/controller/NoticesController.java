@@ -39,7 +39,7 @@ public class NoticesController {
         if( null != notice){
             return R.ok(notice);
         }
-        return R.error(503,"查询详情失败");
+        return R.error(503,"查询通知详情失败");
     }
 
     @ApiOperation("获取最新通知公告，这个通知会全局弹窗展示")

@@ -1,6 +1,6 @@
 package com.lixingyong.meneusoft.api.news;
 
-import com.lixingyong.meneusoft.api.utils.RestUtils;
+import com.lixingyong.meneusoft.api.RestConfig;
 import com.lixingyong.meneusoft.api.vpn.VPNUtil;
 import com.lixingyong.meneusoft.common.exception.WSExcetpion;
 import com.lixingyong.meneusoft.common.utils.DateUtils;
@@ -9,19 +9,15 @@ import com.lixingyong.meneusoft.modules.xcx.entity.Detail;
 import com.lixingyong.meneusoft.modules.xcx.entity.Lecture;
 import com.lixingyong.meneusoft.modules.xcx.entity.Tag;
 import com.lixingyong.meneusoft.modules.xcx.service.TagService;
-import com.lixingyong.meneusoft.modules.xcx.service.impl.TagServiceImpl;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
 
 import java.util.HashMap;
@@ -37,9 +33,9 @@ import java.util.Map;
  */
 
 public class NewsUtil {
-    private static TagService tagService = RestUtils.getTagService();
-    private static RestTemplate restTemplate = RestUtils.getRestTemplate();
-    private static RedisUtils redisUtils = RestUtils.getRedisUtils();
+    private static TagService tagService = RestConfig.getTagService();
+    private static RestTemplate restTemplate = RestConfig.getRestTemplate();
+    private static RedisUtils redisUtils = RestConfig.getRedisUtils();
     private static Map<String,Object> map = new HashMap<>();
     private static Logger logger = LoggerFactory.getLogger(VPNUtil.class);
     /**
