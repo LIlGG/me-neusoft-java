@@ -168,7 +168,7 @@ public class OSSClientUtil {
             // 指定该Object被下载时的名称（指示MINME用户代理如何显示附加的文件，打开或下载，及文件名称）
             metadata.setContentDisposition("filename/filesize=" + fileName);
             // 上传文件 (上传文件流的形式)
-            PutObjectResult putResult = ossClient.putObject(bucketName, folder + fileName, inputStream, metadata);
+            PutObjectResult putResult = ossClient.putObject(bucketName, folder + "/"+ fileName, inputStream, metadata);
             // 解析结果
             resultStr = putResult.getETag();
             logger.debug("上传阿里云OSS成功");
@@ -226,18 +226,16 @@ public class OSSClientUtil {
     /**
      * 获得url链接
      *
-     * @param fileCode
      * @return
      */
-    public static String getUrl(String fileCode) throws WSExcetpion {
-        String key = folder +"/"+fileCode;
+    public static String getUrl(String key) throws WSExcetpion {
         // 设置URL过期时间为10年  3600l* 1000*24*365*10
         Date expiration = new Date(new Date().getTime() + 3600l * 1000 * 24 * 365 * 10);
         // 生成URL
         try{
             URL url = getOSSClient().generatePresignedUrl(bucketName, key, expiration);
             if (url != null) {
-                return url.toString();
+                return url.getProtocol() + "://" + url.getAuthority() + "/" + url.getPath();
             }
         }catch (WSExcetpion e){
            throw new WSExcetpion(e.getMsg());

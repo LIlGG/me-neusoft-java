@@ -19,6 +19,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
+/**
+ * 获取校园通讯录（外网状态）
+ */
 public class ContactUtil {
     private static RestTemplate restTemplate = RestConfig.getRestTemplate();
 

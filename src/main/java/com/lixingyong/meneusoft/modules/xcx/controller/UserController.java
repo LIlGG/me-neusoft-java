@@ -8,13 +8,11 @@ import com.lixingyong.meneusoft.common.utils.JwtUtils;
 import com.lixingyong.meneusoft.common.utils.R;
 import com.lixingyong.meneusoft.modules.xcx.annotation.LoginUser;
 import com.lixingyong.meneusoft.modules.xcx.annotation.Token;
+import com.lixingyong.meneusoft.modules.xcx.entity.LibraryBook;
 import com.lixingyong.meneusoft.modules.xcx.entity.User;
 import com.lixingyong.meneusoft.modules.xcx.entity.UserConfig;
 import com.lixingyong.meneusoft.modules.xcx.entity.Wechat;
-import com.lixingyong.meneusoft.modules.xcx.service.UserConfigService;
-import com.lixingyong.meneusoft.modules.xcx.service.UserLibraryService;
-import com.lixingyong.meneusoft.modules.xcx.service.UserService;
-import com.lixingyong.meneusoft.modules.xcx.service.WechatService;
+import com.lixingyong.meneusoft.modules.xcx.service.*;
 import com.lixingyong.meneusoft.modules.xcx.vo.LoginVO;
 import io.netty.util.internal.StringUtil;
 import io.swagger.annotations.Api;
@@ -48,7 +46,10 @@ public class UserController {
     private UserLibraryService userLibraryService;
     @Autowired
     private UserConfigService userConfigService;
-
+    @Autowired
+    private LibraryBookService libraryBookService;
+    @Autowired
+    private GradeService gradeService;
     @ApiOperation("用户登录")
     @PostMapping("/login")
     public R login(@RequestParam String code){
@@ -176,6 +177,20 @@ public class UserController {
             return R.error("更新失败");
         }
     }
+
+    @ApiOperation("清空用户信息")
+    @PostMapping("/goodbye")
+    @Token
+    public R delUserAllInfo(@LoginUser String userId){
+        userLibraryService.delUserLibraryInfo(Integer.valueOf(userId));
+        userConfigService.delUserConfigInfo(Integer.valueOf(userId));
+        libraryBookService.delLibraryAll(Integer.valueOf(userId));
+        gradeService.delGradeAll(Integer.valueOf(userId));
+        wechatService.delWechat(Integer.valueOf(userId));
+        userService.delUserInfo(Integer.valueOf(userId));
+        return R.ok("已删除用户信息");
+    }
+
 
     @ApiOperation("缓存微信模板消息id")
     @PostMapping("/user/msg_id")

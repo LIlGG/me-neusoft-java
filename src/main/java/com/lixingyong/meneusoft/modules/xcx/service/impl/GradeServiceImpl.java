@@ -33,4 +33,9 @@ public class GradeServiceImpl extends ServiceImpl<GradeDao, Grade> implements Gr
     public void insertOrUpdateGrades(List<Grade> grades) {
         this.insertOrUpdateBatch(grades);
     }
+
+    @Override
+    public void delGradeAll(Integer userId) {
+        this.baseMapper.delete(new EntityWrapper<Grade>().eq("user_id", userId));
+    }
 }

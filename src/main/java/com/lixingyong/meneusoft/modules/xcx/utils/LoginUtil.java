@@ -41,7 +41,7 @@ public class LoginUtil{
     }
     // 仅连接VPN
     public static boolean exeVpnLogin() throws WSExcetpion{
-        fiddler();
+//        fiddler();
         if(VPNUtil.isLogin()){
             return true;
         }

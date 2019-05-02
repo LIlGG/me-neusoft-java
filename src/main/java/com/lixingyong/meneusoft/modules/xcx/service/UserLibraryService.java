@@ -18,4 +18,6 @@ public interface UserLibraryService extends IService<UserLibrary> {
     void insertOrUpdateLibraryAccount(String userId, String student_id, String password);
 
     UserLibrary getUserAccount(UserLibrary userLibrary);
+
+    void delUserLibraryInfo(Integer valueOf);
 }

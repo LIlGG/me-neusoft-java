@@ -51,4 +51,9 @@ public class UserConfigServiceImpl extends ServiceImpl<UserConfigDao, UserConfig
         this.baseMapper.update(userConfig, new EntityWrapper<UserConfig>().eq("user_id", userId));
     }
 
+    @Override
+    public void delUserConfigInfo(Integer userId) {
+        this.delete(new EntityWrapper<UserConfig>().eq("user_id", userId));
+    }
+
 }

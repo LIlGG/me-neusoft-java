@@ -31,11 +31,7 @@ import java.util.*;
  * @Author mail@lixingyong.com
  * @Date 2019-03-16 15:23
  */
-public class LibraryUtil {
-    private static RestTemplate restTemplate = RestConfig.getRestTemplate();
-    private static RedisUtils redisUtils = RestConfig.getRedisUtils();
-    private static Map<String,Object> map = new HashMap<>();
-    private static Logger logger = LoggerFactory.getLogger(LibraryUtil.class);
+public class LibraryUtil extends LibraryAbs {
     /**
      * @Author lixingyong
      * @Description //TODO 登录图书馆
@@ -44,23 +40,17 @@ public class LibraryUtil {
      * @return void
      **/
     public static void libraryLogin(long uid, String barcode, String password){
-        HttpHeaders headers = new HttpHeaders();
+        setCookies(new LinkedList<>());
+        HttpHeaders headers = httpHeaders();
         headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
         // 判断redis中是否存着对应的Cookie
-        if(!redisUtils.hasKey("SVPNCOOKIE")){
-            throw new WSExcetpion("redis中数据不完善");
-        }
-        List<String> cookiesList = new ArrayList<>();
-        cookiesList.add(redisUtils.get("SVPNCOOKIE"));
-        headers.put(HttpHeaders.COOKIE,cookiesList); //将Cookies放入Header
         MultiValueMap<String,String> param = new LinkedMultiValueMap<>();
         param.add("barcode", barcode);
         param.add("password", password);
         param.add("login.x",Integer.toString(0));
         param.add("login.y", Integer.toString(0));
         HttpEntity<MultiValueMap<String,String>> request = new HttpEntity<>(param,headers);//将参数和header组成一个请求
-        map.put("sid",redisUtils.get("SID"));
-        ResponseEntity<Resource> responseEntity = restTemplate.exchange(VPNAPI.PROXY+LibraryAPI.LIBRARYLOGIN,HttpMethod.POST,request,Resource.class,map);
+        ResponseEntity<Resource> responseEntity = restTemplate.exchange(URL(LibraryAPI.LIBRARY_LOGIN),HttpMethod.POST,request,Resource.class, getMap());
         if(responseEntity.getStatusCode().is2xxSuccessful()){
             if(responseEntity.getHeaders().containsKey("Set-Cookie")){
                 if(responseEntity.getHeaders().get("Set-Cookie").size() > 0){
@@ -68,7 +58,7 @@ public class LibraryUtil {
                         String[] cookies = responseEntity.getHeaders().get("Set-Cookie").get(0).split(";");
                         String JSessionId = cookies[0];
                         //将获取到的数据存入redis数据库中并返回
-                        redisUtils.set(Long.toString(uid)+"LIBARARYSESSION",JSessionId);
+                        redisUtils.set(uid+"LIBARARYSESSION",JSessionId);
                         logger.info("获取图书馆登录授权Cookie成功");
                         return;
                     }
@@ -86,19 +76,10 @@ public class LibraryUtil {
      * @return void
      **/
     public static List<LibraryBook> getHistoryBooks(long uid){
-        HttpHeaders headers = new HttpHeaders();
-        headers.set("User-Agent","Mozilla/5.0 (Windows NT 6.3; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/70.0.3538.102 Safari/537.36");
-        // 判断redis中是否存着对应的Cookie
-        if(!redisUtils.hasKey("SVPNCOOKIE") || !redisUtils.hasKey(Long.toString(uid)+"LIBARARYSESSION")){
-            throw new WSExcetpion("redis中数据不完善");
-        }
-        List<String> cookiesList = new ArrayList<>();
-        cookiesList.add(redisUtils.get(Long.toString(uid)+"LIBARARYSESSION"));
-        cookiesList.add(redisUtils.get("SVPNCOOKIE"));
-        headers.put(HttpHeaders.COOKIE,cookiesList); //将Cookies放入Header
-        HttpEntity<String> request = new HttpEntity<>(null,headers);//将参数和header组成一个请求
-        map.put("sid",redisUtils.get("SID"));
-        ResponseEntity<String> responseEntity = restTemplate.exchange(VPNAPI.PROXY+LibraryAPI.LIBRARYHISTORY,HttpMethod.GET,request,String.class,map);
+        setCookies(new LinkedList<>());
+        setCookies(uid+"LIBARARYSESSION");
+        HttpEntity request = httpEntity();
+        ResponseEntity<String> responseEntity = restTemplate.exchange(URL(LibraryAPI.LIBRARY_HISTORY),HttpMethod.GET,request,String.class, getMap());
         if(responseEntity.getStatusCode().is2xxSuccessful()){
             try {
                 String html = new String(responseEntity.getBody().getBytes("ISO-8859-1"),"GBK");
@@ -142,6 +123,7 @@ public class LibraryUtil {
      **/
 
     public static void getTd(Element tr,  List<LibraryBook> libraryBooks, Long user_id){
+
         LibraryBook libraryBook;
         // 获取tr中的所有td标签
         Elements tds = tr.select("td");
@@ -195,19 +177,17 @@ public class LibraryUtil {
      * @return void
      **/
     public static BookSearchVO bookSearch(String title, int curPage){
-        HttpHeaders headers = new HttpHeaders();
-        headers.set("User-Agent","Mozilla/5.0 (Windows NT 6.3; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/70.0.3538.102 Safari/537.36");
-        headers.set("Content-Type","application/x-www-form-urlencoded;charset=gb2312");
-        // 判断redis中是否存着对应的Cookie
-        if(!redisUtils.hasKey("SVPNCOOKIE")){
-            throw new WSExcetpion("redis中数据不完善");
-        }
-        List<String> cookiesList = new ArrayList<>();
-        cookiesList.add(redisUtils.get("SVPNCOOKIE"));
-        headers.put(HttpHeaders.COOKIE,cookiesList); //将Cookies放入Header
+        setCookies(new LinkedList<>());
+        HttpHeaders headers = httpHeaders();
+        headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
+
         MultiValueMap<String,String> param = new LinkedMultiValueMap<>();
         param.add("type","title");
-        param.add("word", title);
+        try {
+            param.add("word", new String(title.getBytes("GBK"), "ISO-8859-1"));
+        } catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
+        }
         param.add("match","mh");
         param.add("recordtype","01");
         param.add("library_id","all");
@@ -228,14 +208,17 @@ public class LibraryUtil {
             param.add("pagesize", "10");
         }
 
-        HttpEntity<MultiValueMap<String,String>> request = new HttpEntity<>(param,headers);//将参数和header组成一个请求
-        map.put("sid",redisUtils.get("SID"));
-        ResponseEntity<String> responseEntity = restTemplate.exchange(VPNAPI.PROXY+LibraryAPI.SEARCH,HttpMethod.POST,request,String.class,map);
+        HttpEntity request = new HttpEntity<>(param,headers);//将参数和header组成一个请求
+        ResponseEntity<String> responseEntity = restIOSTemplate.postForEntity(URL(LibraryAPI.SEARCH), request, String.class, getMap());
         if(responseEntity.getStatusCode().is2xxSuccessful()){
             try{
-                String html = new String(responseEntity.getBody().getBytes("ISO-8859-1"),"GBK");
+                String html = new String(responseEntity.getBody().getBytes("ISO-8859-1"),"gb2312");
+                if(html.contains("没有检索到")){
+                    throw new WSExcetpion("未检索到对应的图书");
+                }
                 // 获取所有的table
                 Document document = Jsoup.parse(html);
+
                 return bookSearchHtml(document);
             }catch (UnsupportedEncodingException e){
                 throw new WSExcetpion("字符串编码转换错误");
@@ -293,19 +276,12 @@ public class LibraryUtil {
      * @return com.lixingyong.meneusoft.modules.xcx.vo.DetailBookVO
      **/
     public static DetailBookVO detailBook(String detailId) {
-        HttpHeaders headers = new HttpHeaders();
-        headers.set("User-Agent","Mozilla/5.0 (Windows NT 6.3; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/70.0.3538.102 Safari/537.36");
-        // 判断redis中是否存着对应的Cookie
-        if(!redisUtils.hasKey("SVPNCOOKIE")){
-            throw new WSExcetpion("redis中数据不完善");
-        }
-        List<String> cookiesList = new ArrayList<>();
-        cookiesList.add(redisUtils.get("SVPNCOOKIE"));
-        headers.put(HttpHeaders.COOKIE,cookiesList); //将Cookies放入Header
-        HttpEntity<MultiValueMap<String,String>> request = new HttpEntity<>(null,headers);//将参数和header组成一个请求
-        map.put("sid",redisUtils.get("SID"));
+        setCookies(new LinkedList<>());
+        HttpEntity request = httpEntity();
+        map = new HashMap<>();
         map.put("rid", detailId);
-        ResponseEntity<String> responseEntity = restTemplate.exchange(VPNAPI.PROXY+LibraryAPI.DETAILS,HttpMethod.GET,request,String.class,map);
+        setMap(map);
+        ResponseEntity<String> responseEntity = restTemplate.exchange(URL(LibraryAPI.DETAILS),HttpMethod.GET,request,String.class, getMap());
         if(responseEntity.getStatusCode().is2xxSuccessful()){
             try {
                 String html = new String(responseEntity.getBody().getBytes("ISO-8859-1"),"GBK");

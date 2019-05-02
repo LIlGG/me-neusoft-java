@@ -25,6 +25,9 @@ import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+/**
+ * 获取一卡通（外网状态）
+ */
 public class EcardUtil {
     private static RestTemplate restTemplate = RestConfig.getRestTemplate();
     private static RedisUtils redisUtils = RestConfig.getRedisUtils();
@@ -55,10 +58,6 @@ public class EcardUtil {
 
 
     public static void updateEcardInfo(long uid, String ecardId) throws WSExcetpion {
-        System.setProperty("http.proxyHost", "localhost");
-        System.setProperty("http.proxyPort", "8888");
-        System.setProperty("https.proxyHost", "localhost");
-        System.setProperty("https.proxyPort", "8888");
         HttpHeaders headers = new HttpHeaders();
         /** 获取redis保存的cookies */
         if(!redisUtils.hasKey(uid+"ECARDCOOKIE")){

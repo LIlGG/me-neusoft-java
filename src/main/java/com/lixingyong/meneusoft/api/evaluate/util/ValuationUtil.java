@@ -48,7 +48,7 @@ public class ValuationUtil {
                     }
             }
         }
-        taskVO.setUrl(EvaluateAPI.EVALUATE_HOME + targetUrl + EvaluateAPI.TASK_SUFFIX);
+        taskVO.setUrl(targetUrl + EvaluateAPI.TASK_SUFFIX);
         return taskVO.getUrl();
     }
 

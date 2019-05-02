@@ -35,9 +35,6 @@ import java.util.Map;
 public class NewsUtil {
     private static TagService tagService = RestConfig.getTagService();
     private static RestTemplate restTemplate = RestConfig.getRestTemplate();
-    private static RedisUtils redisUtils = RestConfig.getRedisUtils();
-    private static Map<String,Object> map = new HashMap<>();
-    private static Logger logger = LoggerFactory.getLogger(VPNUtil.class);
     /**
      * @Author lixingyong
      * @Description //TODO 根据URL，获取新闻列表

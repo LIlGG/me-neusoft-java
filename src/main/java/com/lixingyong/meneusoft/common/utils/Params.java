@@ -15,7 +15,7 @@ import java.util.Map;
  */
 public final class Params extends HashMap<String, Object> implements Serializable {
     /** 二维码跳转默认页面 */
-    private final String PAGE = "pages/index/index";
+    private final String PAGE = "pages/index";
     /** 二维码的宽度，默认为 430px，最小 280px，最大 1280px */
     private final int WIDTH = 430;
     /** 自动配置线条颜色，如果颜色依然是黑色，则说明不建议配置主色调，默认 false */

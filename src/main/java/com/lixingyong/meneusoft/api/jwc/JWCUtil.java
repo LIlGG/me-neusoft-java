@@ -7,6 +7,7 @@ import com.lixingyong.meneusoft.common.exception.WSExcetpion;
 import com.lixingyong.meneusoft.common.utils.MD5Utils;
 import com.lixingyong.meneusoft.common.utils.OSSClientUtil;
 import com.lixingyong.meneusoft.common.utils.RedisUtils;
+import org.apache.http.client.methods.HttpHead;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.core.io.Resource;
@@ -16,10 +17,7 @@ import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * @ClassName JWCUtil
@@ -29,21 +27,8 @@ import java.util.Map;
  * @Version 1.0
  */
 
-public class JWCUtil {
-    private static RestTemplate restTemplate = RestConfig.getRestTemplate();
-    private static RedisUtils redisUtils = RestConfig.getRedisUtils();
-    private static Map<String,Object> map = new HashMap<>();
-    /** 阿里云API的bucket名称 */
-    private static String bucketName = RestConfig.getBucketName();
-    /** 阿里云API的文件夹名称 */
-    private static String folder = RestConfig.getFolder();
-    /** 阿里云API的文件前缀 */
-    private static String codeFolder = RestConfig.getCodeFolder();
-    /** 阿里云API的文件后缀 */
-    private static String suffix = RestConfig.getSuffix();
-
+public class JWCUtil extends JWCAbs {
     private static Logger logger = LoggerFactory.getLogger(JWCUtil.class);
-
     /**
      * @Author lixingyong
      * @Description //TODO 获取教务处的Cookie，当前Cookie针对与每个账号而言
@@ -52,17 +37,9 @@ public class JWCUtil {
      * @return boolean
      **/
     public static void getJWCCookie(long uid) throws WSExcetpion {
-        HttpHeaders headers = new HttpHeaders();
-        /** 获取redis保存的cookies */
-        if(!redisUtils.hasKey("SVPNCOOKIE") || !redisUtils.hasKey("SID")){
-            throw new WSExcetpion("redis中不存在SVPNCOOKIE");
-        }
-        List<String> cookiesList = new ArrayList<>();
-        cookiesList.add(redisUtils.get("SVPNCOOKIE"));
-        headers.put(HttpHeaders.COOKIE,cookiesList); //将Cookies放入Header
-        HttpEntity<String> request = new HttpEntity<>(null,headers);//将参数和header组成一个请求
-        map.put("sid",redisUtils.get("SID"));
-        ResponseEntity<String> responseEntity = restTemplate.exchange(VPNAPI.PROXY+JWCAPI.JWCSID,HttpMethod.GET,request,String.class,map);
+        setCookies(new LinkedList<>());
+        HttpEntity request = httpEntity();
+        ResponseEntity<String> responseEntity = restTemplate.exchange(URL(JWCAPI.JWCSID), HttpMethod.GET, request, String.class,getMap());
         if(responseEntity.getStatusCode().is2xxSuccessful()){
             if(responseEntity.getHeaders().containsKey("Set-Cookie")){
                 if(responseEntity.getHeaders().get("Set-Cookie").size() > 0){
@@ -89,18 +66,16 @@ public class JWCUtil {
      * @return java.util.Map<java.lang.String                                                               ,                                                               java.lang.Object>
      **/
     public static void getJWCInfo(long uid) throws WSExcetpion {
-        HttpHeaders headers = new HttpHeaders();
+
         // 判断redis中是否存着对应的Cookie
-        if(!redisUtils.hasKey("SVPNCOOKIE") || !redisUtils.hasKey(uid +"ASPCOOKIE") || !redisUtils.hasKey("SID")){
-            throw new WSExcetpion("redis中数据不完善");
+        if(!redisUtils.hasKey(uid +"ASPCOOKIE")){
+            throw new WSExcetpion("redis中缺少ASPCOOKIE");
         }
         List<String> cookiesList = new ArrayList<>();
-        cookiesList.add(redisUtils.get("SVPNCOOKIE"));
         cookiesList.add(redisUtils.get(uid+"ASPCOOKIE"));
-        headers.put(HttpHeaders.COOKIE,cookiesList); //将Cookies放入Header
-        HttpEntity<String> request = new HttpEntity<>(null,headers);//将参数和header组成一个请求
-        map.put("sid",redisUtils.get("SID"));
-        ResponseEntity<String> responseEntity = restTemplate.exchange(VPNAPI.PROXY+JWCAPI.LOGIN,HttpMethod.GET,request,String.class,map);
+        setCookies(cookiesList);
+        HttpEntity request = httpEntity();
+        ResponseEntity<String> responseEntity = restTemplate.exchange(URL(JWCAPI.LOGIN),HttpMethod.GET,request,String.class, getMap());
         if(responseEntity.getStatusCode().is2xxSuccessful()){
             if(responseEntity.getBody().indexOf("__VIEWSTATE") > 0){
                 String body = responseEntity.getBody();
@@ -123,26 +98,19 @@ public class JWCUtil {
      * @return void
      **/
     public static String getValidateCode(long uid) throws WSExcetpion{
-        HttpHeaders headers = new HttpHeaders();
+        setCookies(new LinkedList<>());
         // 判断redis中是否存着对应的Cookie
-        if(!redisUtils.hasKey("SVPNCOOKIE") || !redisUtils.hasKey(uid +"ASPCOOKIE") || !redisUtils.hasKey("SID")){
-            return null;
-        }
-        List<String> cookiesList = new ArrayList<>();
-        cookiesList.add(redisUtils.get("SVPNCOOKIE"));
-        cookiesList.add(redisUtils.get(uid+"ASPCOOKIE"));
-        headers.put(HttpHeaders.COOKIE,cookiesList); //将Cookies放入Header
-        HttpEntity<String> request = new HttpEntity<>(null,headers);//将参数和header组成一个请求
-        map.put("sid",redisUtils.get("SID"));
-        ResponseEntity<Resource> responseEntity = restTemplate.exchange(VPNAPI.PROXY+JWCAPI.CODE,HttpMethod.GET,request,Resource.class,map);
+        setCookies(uid +"ASPCOOKIE");
+        HttpEntity request = httpEntity();
+        ResponseEntity<Resource> responseEntity = restTemplate.exchange(URL(JWCAPI.CODE),HttpMethod.GET,request,Resource.class,getMap());
         InputStream in = null;
         if(responseEntity.getStatusCode().is2xxSuccessful()){
             try {
                 in = responseEntity.getBody().getInputStream();
                 OSSClient oss = OSSClientUtil.getOSSClient();
-                String key = OSSClientUtil.uploadObject2OSS(oss,in,codeFolder+uid+suffix,bucketName,folder);
+                OSSClientUtil.uploadObject2OSS(oss,in,codeFolder+uid+suffix,bucketName,folder);
                 logger.info("获取验证码并上传至OSS成功");
-                String url = OSSClientUtil.getUrl(codeFolder+uid+suffix);
+                String url = OSSClientUtil.getUrl(folder + "/" + codeFolder+uid+suffix);
                 return url;
             } catch (IOException e) {
                 e.printStackTrace();
@@ -169,25 +137,20 @@ public class JWCUtil {
      * @return void
      **/
     public static void jwcStudentLogin(long uid, String account, String pw, String vCode) throws WSExcetpion{
-        HttpHeaders headers = new HttpHeaders();
+        setCookies(new LinkedList<>());
         // 判断redis中是否存着对应的Cookie
-        if(!redisUtils.hasKey("SVPNCOOKIE") || !redisUtils.hasKey(uid+"ASPCOOKIE") || !redisUtils.hasKey("SID") || !redisUtils.hasKey(uid+"VIEWSTATE")){
-            throw new WSExcetpion("redis中数据不完善");
+        if( !redisUtils.hasKey(uid+"VIEWSTATE")){
+            throw new WSExcetpion("redis中缺少VIEWSTATE");
         }
-        headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
-        List<String> cookiesList = new ArrayList<>();
-        cookiesList.add(redisUtils.get("SVPNCOOKIE"));
-        cookiesList.add(" name=value");
-        cookiesList.add(redisUtils.get(uid+"ASPCOOKIE"));
-        headers.put(HttpHeaders.COOKIE,cookiesList); //将Cookies放入Header
-
+        setCookies(uid +"ASPCOOKIE");
+        HttpHeaders httpHeaders = httpHeaders();
+        httpHeaders.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
         // 获取参数
         String viewState = redisUtils.get(uid +"VIEWSTATE");
         String pcInfo = "";
         MultiValueMap<String,String> param = studentLoginEncryption(viewState, pcInfo, account, pw, vCode);
-        HttpEntity<MultiValueMap<String,String>> request = new HttpEntity<>(param,headers);//将参数和header组成一个请求
-        map.put("sid",redisUtils.get("SID"));
-        ResponseEntity<Resource> responseEntity = restTemplate.exchange(VPNAPI.PROXY+JWCAPI.LOGIN,HttpMethod.POST,request,Resource.class,map);
+        HttpEntity<MultiValueMap<String,String>> request = new HttpEntity<>(param,httpHeaders);//将参数和header组成一个请求
+        ResponseEntity<Resource> responseEntity = restTemplate.exchange(URL(JWCAPI.LOGIN), HttpMethod.POST,request,Resource.class, getMap());
         if(responseEntity.getStatusCode().is2xxSuccessful()){
             return;
         }
@@ -219,18 +182,14 @@ public class JWCUtil {
 
     /** 教务处学生基本学分情况查询 */
     public static void stuXyjzqk(long uid){
-        HttpHeaders headers = new HttpHeaders();
+        setCookies(new LinkedList<>());;
         // 判断redis中是否存着对应的Cookie
-        if(!redisUtils.hasKey("SVPNCOOKIE") || !redisUtils.hasKey(uid +"ASPCOOKIE") || !redisUtils.hasKey("SID") || !redisUtils.hasKey(uid +"VIEWSTATE")){
-            throw new WSExcetpion("redis中数据不完善");
+        if(!redisUtils.hasKey(uid+"VIEWSTATE")){
+            throw new WSExcetpion("redis中缺少VIEWSTATE");
         }
-        List<String> cookiesList = new ArrayList<>();
-        cookiesList.add(redisUtils.get("SVPNCOOKIE"));
-        cookiesList.add(redisUtils.get(uid +"ASPCOOKIE"));
-        headers.put(HttpHeaders.COOKIE,cookiesList); //将Cookies放入Header
-        HttpEntity request = new HttpEntity<>(null,headers);//将参数和header组成一个请求
-        map.put("sid",redisUtils.get("SID"));
-        ResponseEntity<Resource> responseEntity = restTemplate.exchange(VPNAPI.PROXY+JWCAPI.XYJZQK,HttpMethod.GET,request,Resource.class,map);
+        setCookies(uid +"ASPCOOKIE");
+        HttpEntity request = httpEntity();
+        ResponseEntity<Resource> responseEntity = restTemplate.exchange(URL(JWCAPI.XYJZQK),HttpMethod.GET,request,Resource.class,getMap());
         if(responseEntity.getStatusCode().is2xxSuccessful()){
             return;
         }

@@ -18,4 +18,6 @@ public interface UserConfigService extends IService<UserConfig> {
     void setUserConfigNotify(String notify, String userId);
 
     void setUserType(Integer userType, Integer userId);
+
+    void delUserConfigInfo(Integer valueOf);
 }

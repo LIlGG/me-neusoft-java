@@ -9,19 +9,20 @@ package com.lixingyong.meneusoft.api.library;
 public final class LibraryAPI {
     /** 图书馆系统首页(无需登录VPN) */
     public static final String LIBRARYHOME = "http://library.neusoft.edu.cn";
-
     /** 图书馆公共检索系统 */
-    public static final String LIBRARYREADER = "http/reader.library.neusoft.edu.cn";
+    public static final String LIBRARY_READER = "http://reader.library.neusoft.edu.cn";
+    /** 图书馆公共检索系统（VPN版本） */
+    public static final String LIBRARY_READER_VPN = "http/reader.library.neusoft.edu.cn";
 
     /** 图书馆用户登录 */
-    public static final String LIBRARYLOGIN = LIBRARYREADER + "/reader/login.jsp?str_kind=login";
+    public static final String LIBRARY_LOGIN = "/reader/login.jsp?str_kind=login";
 
     /** 图书馆借阅历史查询*/
-    public static final String LIBRARYHISTORY = LIBRARYREADER+ "/reader/readerHistory.jsp";
+    public static final String LIBRARY_HISTORY = "/reader/readerHistory.jsp";
 
     /** 图书馆图书搜索 */
-    public static final String SEARCH = LIBRARYREADER + "/book/queryOut.jsp";
+    public static final String SEARCH = "/book/queryOut.jsp";
 
     /** 图书信息详细信息查询*/
-    public static final String DETAILS = LIBRARYREADER + "/book/detailBook.jsp?rec_ctrl_id={rid}";
+    public static final String DETAILS = "/book/detailBook.jsp?rec_ctrl_id={rid}";
 }

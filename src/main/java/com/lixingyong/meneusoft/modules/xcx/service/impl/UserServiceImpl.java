@@ -1,5 +1,6 @@
 package com.lixingyong.meneusoft.modules.xcx.service.impl;
 
+import com.baomidou.mybatisplus.mapper.EntityWrapper;
 import com.baomidou.mybatisplus.service.impl.ServiceImpl;
 import com.lixingyong.meneusoft.api.bind.Type;
 import com.lixingyong.meneusoft.common.exception.WSExcetpion;
@@ -110,6 +111,11 @@ public class UserServiceImpl extends ServiceImpl<UserDao, User> implements UserS
             return;
         }
         throw new WSExcetpion("无法登录至UFS系统");
+    }
+
+    @Override
+    public void delUserInfo(Integer userId) {
+        this.baseMapper.delete(new EntityWrapper<User>().eq("id", userId));
     }
 
 }

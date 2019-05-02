@@ -2,6 +2,7 @@ package com.lixingyong.meneusoft.modules.xcx.entity;
 
 import com.baomidou.mybatisplus.annotations.TableId;
 import com.baomidou.mybatisplus.annotations.TableName;
+import com.baomidou.mybatisplus.enums.IdType;
 import lombok.Data;
 
 import java.io.Serializable;
@@ -16,10 +17,8 @@ import java.io.Serializable;
 @Data
 @TableName("wechat")
 public class Wechat extends BaseEntity {
-    /** 微信认证id */
-    @TableId
-    private int id;
     /** 微信用户唯一标识 */
+    @TableId(type= IdType.ID_WORKER_STR)
     private String openid;
     /** 会话密匙 */
     private String sessionKey;
@@ -33,6 +32,6 @@ public class Wechat extends BaseEntity {
     private int userId;
     @Override
     protected Serializable pkVal() {
-        return this.getId();
+        return null;
     }
 }

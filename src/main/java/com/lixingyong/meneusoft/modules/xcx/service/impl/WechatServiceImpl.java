@@ -4,7 +4,6 @@ import com.baomidou.mybatisplus.mapper.EntityWrapper;
 import com.baomidou.mybatisplus.service.impl.ServiceImpl;
 import com.lixingyong.meneusoft.modules.xcx.dao.WechatDao;
 import com.lixingyong.meneusoft.modules.xcx.entity.Wechat;
-import com.lixingyong.meneusoft.modules.xcx.entity.WxUser;
 import com.lixingyong.meneusoft.modules.xcx.service.WechatService;
 import org.springframework.boot.configurationprocessor.json.JSONException;
 import org.springframework.boot.configurationprocessor.json.JSONObject;
@@ -58,6 +57,11 @@ public class WechatServiceImpl extends ServiceImpl<WechatDao, Wechat> implements
             wechat.setGender("男");
         }
 
-        this.insert(wechat);
+        this.insertOrUpdate(wechat);
+    }
+
+    @Override
+    public void delWechat(Integer userId) {
+        this.baseMapper.delete(new EntityWrapper<Wechat>().eq("user_id", userId));
     }
 }

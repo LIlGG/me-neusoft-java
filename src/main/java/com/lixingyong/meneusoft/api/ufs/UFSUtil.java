@@ -20,27 +20,15 @@ import java.util.*;
 /**
  * UFS系统
  */
-public class UFSUtil {
-    private static RestTemplate restTemplate = RestConfig.getRestTemplate();
-    private static RedisUtils redisUtils = RestConfig.getRedisUtils();
-    private static Map<String,Object> map = new HashMap<>();
-    private static UserService userService = RestConfig.getUserService();
+public class UFSUtil  extends UFSAbs{
 
     /**
      * 获取会话cookie
      */
     private static String getCookie(){
-        /** 获取redis保存的VPNcookies */
-//        if(!redisUtils.hasKey("SVPNCOOKIE") || !redisUtils.hasKey("SID")){
-//            throw new WSExcetpion("redis中不存在SVPNCOOKIE");
-//        }
-        HttpHeaders headers = new HttpHeaders();
-        List<String> cookieList = new ArrayList<>();
-        cookieList.add(null);
-        headers.put(HttpHeaders.COOKIE,cookieList); //将Cookies放入Header
-        headers.set("User-Agent","Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/73.0.3683.103 Safari/537.37");
-        HttpEntity<String> request = new HttpEntity<>(null,headers);
-        ResponseEntity<String> responseEntity = restTemplate.exchange(UFSAPI.LOGIN, HttpMethod.GET,request,String.class);
+        setCookies(new LinkedList<>());
+        HttpEntity request = httpEntity();
+        ResponseEntity<String> responseEntity = restTemplate.exchange(URL(UFSAPI.LOGIN), HttpMethod.GET,request,String.class, getMap());
         if(responseEntity.getStatusCode().is2xxSuccessful()){
             // 获取cookie
             List<String> cookies = responseEntity.getHeaders().get("Set-Cookie");
@@ -64,20 +52,21 @@ public class UFSUtil {
             }
         }
         //登录前首先获取本次登录所需cookie
+        setCookies(new LinkedList<>());
         String cookie = getCookie();
-        HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
-        // 将cookie放入header
         List<String> cookieList = new ArrayList<>();
         cookieList.add(cookie);
-        headers.put(HttpHeaders.COOKIE,cookieList); //将Cookies放入Header
+        setCookies(cookieList);
+        HttpHeaders headers = httpHeaders();
+        headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
+        // 将cookie放入header
         MultiValueMap<String,String> param = new LinkedMultiValueMap<>();
         param.add("username", account);
         param.add("upwd", pw);
         param.add("typeid", "01");
         param.add("method","登录");
         HttpEntity<MultiValueMap<String,String>> request = new HttpEntity<>(param,headers);//将参数和header组成一个请求
-        ResponseEntity<String> response = restTemplate.exchange(UFSAPI.LOGIN_ACTION,HttpMethod.POST,request,String.class);
+        ResponseEntity<String> response = restTemplate.exchange(URL(UFSAPI.LOGIN_ACTION),HttpMethod.POST,request,String.class, getMap());
         if(response.getStatusCode().is2xxSuccessful()){
             String html = response.getBody();
             if(html.contains("学生用户导航")){
@@ -93,16 +82,10 @@ public class UFSUtil {
      * 查询当前用户身份(查询年份)
      */
     public static String baseInfo(int userId){
+        setCookies(new LinkedList<>());
         loginVail(userId);
-        HttpHeaders headers = new HttpHeaders();
-        //登录前首先获取本次登录所需cookie
-        String cookie = redisUtils.get(userId+"UFS");
-        // 将cookie放入header
-        List<String> cookies = new ArrayList<>();
-        cookies.add(cookie);
-        headers.put(HttpHeaders.COOKIE,cookies); //将Cookies放入Header
-        HttpEntity request = new HttpEntity<>(null,headers);//将参数和header组成一个请求
-        ResponseEntity<String> response = restTemplate.exchange(UFSAPI.BASE_INFO,HttpMethod.GET,request,String.class);
+        HttpEntity request = vailHttpEntity(userId);
+        ResponseEntity<String> response = restTemplate.exchange(URL(UFSAPI.BASE_INFO),HttpMethod.GET,request,String.class, getMap());
         if(response.getStatusCode().is2xxSuccessful()){
             String html = response.getBody();
             Document document = Jsoup.parse(html);
@@ -121,17 +104,11 @@ public class UFSUtil {
      * 获取至今为止所有的学年
      */
     public static List<String> schoolYear(int userId){
+        setCookies(new LinkedList<>());
         List<String> schoolYears = new ArrayList<>();
         loginVail(userId);
-        HttpHeaders headers = new HttpHeaders();
-        //登录前首先获取本次登录所需cookie
-        String cookie = redisUtils.get(userId+"UFS");
-        // 将cookie放入header
-        List<String> cookies = new ArrayList<>();
-        cookies.add(cookie);
-        headers.put(HttpHeaders.COOKIE,cookies); //将Cookies放入Header
-        HttpEntity request = new HttpEntity<>(null,headers);//将参数和header组成一个请求
-        ResponseEntity<String> response = restTemplate.exchange(UFSAPI.QUERY_SCORE_PAGE,HttpMethod.GET,request,String.class);
+        HttpEntity request = vailHttpEntity(userId);
+        ResponseEntity<String> response = restTemplate.exchange(URL(UFSAPI.QUERY_SCORE_PAGE),HttpMethod.GET,request,String.class, getMap());
         if(response.getStatusCode().is2xxSuccessful()){
             String html = response.getBody();
             Document document = Jsoup.parse(html);
@@ -150,15 +127,12 @@ public class UFSUtil {
      */
     public static List<Grade> getGradeList(String courseYear, int term, int userId){
         List<Grade> grades = new ArrayList<>();
+        setCookies(new LinkedList<>());
         loginVail(userId);
-        HttpHeaders headers = new HttpHeaders();
+        setCookies(userId+"UFS");
+        HttpHeaders headers = httpHeaders();
         headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
         //登录前首先获取本次登录所需cookie
-        String cookie = redisUtils.get(userId+"UFS");
-        // 将cookie放入header
-        List<String> cookies = new ArrayList<>();
-        cookies.add(cookie);
-        headers.put(HttpHeaders.COOKIE,cookies); //将Cookies放入Header
         MultiValueMap<String, String> params = new LinkedMultiValueMap<>();
         String studentId = userService.getUserInfo(userId).getStudentId();
         params.add("orderBy", "1");
@@ -167,7 +141,7 @@ public class UFSUtil {
         params.add("courseTermList", Integer.toString(term));
         params.add("method", "查询");
         HttpEntity request = new HttpEntity<>(params,headers);//将参数和header组成一个请求
-        ResponseEntity<String> response = restTemplate.exchange(UFSAPI.QUERY_SCORE,HttpMethod.POST,request,String.class);
+        ResponseEntity<String> response = restTemplate.exchange(URL(UFSAPI.QUERY_SCORE),HttpMethod.POST,request,String.class, getMap());
         if(response.getStatusCode().is2xxSuccessful()){
             String html = response.getBody();
             Document document = Jsoup.parse(html);
@@ -235,12 +209,11 @@ public class UFSUtil {
      */
     public static boolean logout(String session) {
         // 将cookie放入header
-        HttpHeaders headers = new HttpHeaders();
         List<String> cookieList = new ArrayList<>();
         cookieList.add(session);
-        headers.put(HttpHeaders.COOKIE,cookieList); //将Cookies放入Header
-        HttpEntity<String> request = new HttpEntity<>(null,headers);
-        ResponseEntity<Map> responseEntity = restTemplate.exchange(UFSAPI.LOGOUT, HttpMethod.GET,request,Map.class);
+        setCookies(cookieList);
+        HttpEntity request = httpEntity();
+        ResponseEntity<Map> responseEntity = restTemplate.exchange(URL(UFSAPI.LOGOUT), HttpMethod.GET,request,Map.class, getMap());
         if(responseEntity.getStatusCode().is3xxRedirection()){
             return true;
         }

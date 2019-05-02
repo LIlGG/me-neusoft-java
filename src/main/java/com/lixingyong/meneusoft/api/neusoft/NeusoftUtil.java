@@ -12,6 +12,7 @@ import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
 import org.springframework.util.LinkedMultiValueMap;
@@ -23,18 +24,15 @@ import java.util.*;
 /**
  * 其他所有类型的教学系统请求
  */
-public class NeusoftUtil {
-    private static RestTemplate restTemplate = RestConfig.getRestTemplate();
-    private static RedisUtils redisUtils = RestConfig.getRedisUtils();
-    private static Map<String,Object> map = new HashMap<>();
+public class NeusoftUtil extends NeusoftAbs {
     /**
      * 获取校历列表请求（需登录VPN）
      */
     public static Map<Integer, String> termList(){
+        setCookies(new LinkedList<>());
         Map<Integer, String> terms = new LinkedHashMap<>();
-        // 暂时不使用VPN登录
-        HttpEntity<String> request = new HttpEntity<>(null,null);//将参数和header组成一个请求
-        ResponseEntity<String> response = restTemplate.exchange(NeusoftAPI.TERM, HttpMethod.GET,request,String.class);
+        HttpEntity request = httpEntity();
+        ResponseEntity<String> response = restTemplate.exchange(URL(NeusoftAPI.TERM), HttpMethod.GET,request,String.class, getMap());
         if(response.getStatusCode().is2xxSuccessful()){
             Document html = Jsoup.parse(Objects.requireNonNull(response.getBody()));
             Elements options = html.select("select[name=sel_xnxq] > option");
@@ -47,11 +45,13 @@ public class NeusoftUtil {
     }
 
     public static Term term(Integer termId, String termName) {
+        setCookies(new LinkedList<>());
         Term term = new Term();
+        HttpHeaders httpHeaders = httpHeaders();
         MultiValueMap<String,Object> param = new LinkedMultiValueMap<>();
         param.add("sel_xnxq", termId);
-        HttpEntity<MultiValueMap<String,Object>> request = new HttpEntity<>(param,null);//将参数和header组成一个请求
-        ResponseEntity<String> response = restTemplate.exchange(NeusoftAPI.TERM, HttpMethod.POST,request,String.class);
+        HttpEntity<MultiValueMap<String,Object>> request = new HttpEntity<>(param,httpHeaders);//将参数和header组成一个请求
+        ResponseEntity<String> response = restTemplate.exchange(URL(NeusoftAPI.TERM), HttpMethod.POST, request,String.class, getMap());
         if(response.getStatusCode().is2xxSuccessful()){
             Document html = Jsoup.parse(Objects.requireNonNull(response.getBody()));
             Element table = html.selectFirst("b:containsOwn("+termName+")");
@@ -69,9 +69,11 @@ public class NeusoftUtil {
     }
 
     public static List<TermEvent> getTermEvents(int id, String date) {
+        setCookies(new LinkedList<>());
         ArrayList<TermEvent> termEvents = new ArrayList<>();
         HttpEntity<MultiValueMap<String,Object>> request = new HttpEntity<>(null,null);//将参数和header组成一个请求
         String[] ym = date.split("-");
+        map = new HashMap<>();
         map.put("year",ym[0]);
         map.put("month", ym[1]);
         date = ym[0] + "-"+ ym[1].replace("0", "");

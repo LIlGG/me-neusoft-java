@@ -23,9 +23,9 @@ public class BindUtil {
     public static boolean accountStatus(String user_id, String account, String pw, String vCode, Type type){
         // 执行登录程序
         // 判断VPN是否已登录
-//        if(!LoginUtil.exeVpnLogin()){
-//            return false;
-//        }
+        if(!LoginUtil.exeVpnLogin()){
+            return false;
+        }
         switch (type){
             case JWC:
                 // 执行教务处登录程序

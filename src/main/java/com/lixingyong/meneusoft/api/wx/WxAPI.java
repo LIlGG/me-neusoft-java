@@ -17,5 +17,5 @@ public final class WxAPI {
     public final static String ACCESS_TOKEN = HOST+"/cgi-bin/token?grant_type=client_credential&appid={app_id}&secret={secret}";
 
     /** 获取A类小程序码 */
-    public final static String WX_A_CODE = HOST+"/wxa/getwxacodeunlimit?access_token=";
+    public final static String WX_A_CODE = HOST+"/wxa/getwxacodeunlimit?access_token={token}";
 }

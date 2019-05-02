@@ -32,14 +32,14 @@ public class EvaluateController {
         String[] terms = new String[]{"秋","春"};
         List<EvaluatesVO> result = new LinkedList<>();
         // 获取评教信息
-        EvaluateVO evaluateVO = EvaluateUtil.getEvaluates(Long.parseLong(userId));
+        EvaluateVO evaluateVO = EvaluateUtil.getEvaluates(Integer.valueOf(userId));
         // 根据获得的评教信息，执行不同的请求，获取其需要评价的信息
         for(ValuationTaskVO valuationTaskVO : evaluateVO.getValuationTasks()){
             EvaluatesVO evaluatesVO = new EvaluatesVO();
             if(valuationTaskVO.getObjCnt() > 0){
                 // 获取当前评教列表
                 ValuationUtil.taskTargetUrl(valuationTaskVO);
-                List<TaskListVO> taskListVOS = EvaluateUtil.getTaskList(Long.parseLong(userId), valuationTaskVO);
+                List<TaskListVO> taskListVOS = EvaluateUtil.getTaskList(Integer.valueOf(userId), valuationTaskVO);
                 if(taskListVOS!=null){
                     evaluatesVO.setEisId(valuationTaskVO.getEisId());
                     evaluatesVO.setPEisId(valuationTaskVO.getPEisId());
@@ -68,7 +68,7 @@ public class EvaluateController {
         // 根据获取到的数据，请求网址并封装问题详情
         String url = ValuationUtil.taskTargetUrl(evaluatesVO.getEisId(), evaluatesVO.getPEisId(), evaluatesVO.getVersion());
         // 通过当前url和参数，请求问题列表
-        Evaluate evaluate = EvaluateUtil.getTaskIssue(evaluatesVO, url + "&taskId={taskId}", taskId, Long.parseLong(userId));
+        Evaluate evaluate = EvaluateUtil.getTaskIssue(evaluatesVO, url + "&taskId={taskId}", taskId, Integer.valueOf(userId));
         if(null != evaluate){
             for(TaskListVO taskListVO : evaluatesVO.getValue()){
                 if(Integer.valueOf(taskListVO.getTaskId()) == taskId){

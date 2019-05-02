@@ -11,6 +11,7 @@ management:
   server:
     port: 9000
 
+
 spring:
   datasource:
     driverClassName: com.mysql.cj.jdbc.Driver
@@ -41,7 +42,6 @@ spring:
         max-wait: -1ms
         max-idle: 10
         min-idle: 0
-
 wx:
   jwt:
     # 你的secret密匙
@@ -74,3 +74,10 @@ mybatis-plus:
     map-underscore-to-camel-case: true
     cache-enabled: false
     call-setters-on-nulls: true
+#logging:
+#  path: meneusoft.log
+#  level:
+#    root: WARN
+#    com:
+#      lixingyong:
+#        neusoft: WARN

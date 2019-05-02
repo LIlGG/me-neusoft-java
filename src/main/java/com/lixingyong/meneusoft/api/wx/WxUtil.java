@@ -1,16 +1,24 @@
 package com.lixingyong.meneusoft.api.wx;
 
+import com.aliyun.oss.OSSClient;
+import com.lixingyong.meneusoft.api.RestConfig;
 import com.lixingyong.meneusoft.api.wx.WxAPI;
 import com.lixingyong.meneusoft.common.exception.WSExcetpion;
 import com.lixingyong.meneusoft.common.utils.JSONUtils;
+import com.lixingyong.meneusoft.common.utils.OSSClientUtil;
 import com.lixingyong.meneusoft.common.utils.Params;
 import com.lixingyong.meneusoft.common.utils.RedisUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.io.Resource;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
 
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -21,14 +29,18 @@ import java.util.Map;
  * @Date 2018/11/5 11:51
  * @Version 1.0
  */
-@Component
 public class WxUtil {
+    private static RedisUtils redisUtils = RestConfig.getRedisUtils();
+    private static String APP_ID = RestConfig.getAppId();
+    private static String APP_SECRET = RestConfig.getAppSecret();
+    private static RestTemplate restTemplate = RestConfig.getBaseRestTemplate();
 
-
-    private static RedisUtils redisUtils;
-    private static String APP_ID;
-    private static String APP_SECRET;
-    private static RestTemplate restTemplate;
+    /** 阿里云API的文件前缀 */
+    protected static String qcodeFolder = RestConfig.getQcodeFolder();
+    /** 阿里云API的文件后缀 */
+    protected static String suffix = RestConfig.getQcodeSuffix();
+    /** 阿里云API的bucket名称 */
+    protected static String bucketName = RestConfig.getBucketName();
     /**
      * @Author lixingyong
      * @Description //TODO 用户登录
@@ -82,39 +94,17 @@ public class WxUtil {
         return null;
     }
 
-    public static String getWXACodeUnlimit(Params params){
-        if(params.size() > 0){
+    public static byte[] getWXACodeUnlimit(Params params, String accessToken) throws WSExcetpion {
+        if (params.size() > 0) {
             String param = JSONUtils.toJson(params);
-            System.out.println(param);
-            ResponseEntity<String> responseEntity = restTemplate.postForEntity(WxAPI.WX_A_CODE+getAccessToken(),param,String.class);
-            if(responseEntity.getStatusCode().is2xxSuccessful()){
-                Map result =  JSONUtils.fromJson(responseEntity.getBody(),Map.class);
-                if(!result.containsKey("errcode") ){
-                    return responseEntity.getBody();
-                }
-                System.out.println(result.toString());
+            ResponseEntity<byte[]> responseEntity = restTemplate.postForEntity(WxAPI.WX_A_CODE, param, byte[].class, accessToken);
+            InputStream in = null;
+            if (responseEntity.getStatusCode().is2xxSuccessful()) {
+                byte[] result = responseEntity.getBody();
+                return result;
             }
         }
         return null;
     }
 
-    @Autowired(required = true)
-    private void setRedisUtils(RedisUtils redisUtils){
-        this.redisUtils = redisUtils;
-    }
-
-    @Value("${wx.xcx.appid}")
-    public void setAppId(String appid){
-        this.APP_ID = appid;
-    }
-
-    @Value("${wx.xcx.appsecret}")
-    public void setAppSecret(String appSecret){
-        this.APP_SECRET = appSecret;
-    }
-
-    @Autowired(required = true)
-    public void setRestTemplate(RestTemplate restTemplate){
-        this.restTemplate = restTemplate;
-    }
 }

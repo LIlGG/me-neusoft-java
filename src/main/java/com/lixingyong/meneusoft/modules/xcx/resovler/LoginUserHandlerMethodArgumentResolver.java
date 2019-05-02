@@ -2,8 +2,6 @@ package com.lixingyong.meneusoft.modules.xcx.resovler;
 
 import com.lixingyong.meneusoft.common.interceptor.AuthorizationInterceptor;
 import com.lixingyong.meneusoft.modules.xcx.annotation.LoginUser;
-import com.lixingyong.meneusoft.modules.xcx.entity.User;
-import com.lixingyong.meneusoft.modules.xcx.entity.WxUser;
 import org.springframework.core.MethodParameter;
 import org.springframework.stereotype.Component;
 import org.springframework.web.bind.support.WebDataBinderFactory;

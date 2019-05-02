@@ -46,4 +46,6 @@ public interface UserService extends IService<User> {
     void insertOrUpdateEcardInfo(String userId, String id);
 
     void insertOrUpdateUfsAccount(String account, String password, String userId);
+
+    void delUserInfo(Integer valueOf);
 }

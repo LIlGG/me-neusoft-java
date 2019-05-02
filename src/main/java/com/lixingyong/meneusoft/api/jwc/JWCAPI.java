@@ -9,10 +9,12 @@ package com.lixingyong.meneusoft.api.jwc;
  */
 public final class JWCAPI {
     /** VPN类型教务处首页 */
-    public final static String JWCAPI = "http/newjw.neusoft.edu.cn";
+    public final static String JWC_API = "http://newjw.neusoft.edu.cn";
+    /** VPN类型教务处首页 */
+    public final static String JWC_VPN_API = "http/newjw.neusoft.edu.cn";
 
     /** 获取Session_Id */
-    public final static String JWCSID = JWCAPI + "/jwweb";
+    public final static String JWCSID = "/jwweb";
 
     /** 获取验证码 */
     public final static String CODE = JWCSID + "/sys/ValidateCode.aspx";

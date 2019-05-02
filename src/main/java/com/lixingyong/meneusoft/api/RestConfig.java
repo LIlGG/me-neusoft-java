@@ -15,6 +15,8 @@ import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.impl.client.LaxRedirectStrategy;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
 import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
 import org.springframework.http.client.SimpleClientHttpRequestFactory;
 import org.springframework.http.converter.FormHttpMessageConverter;
@@ -25,6 +27,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
 
 import java.nio.charset.Charset;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -35,7 +38,9 @@ import java.util.List;
  */
 @Component
 public class RestConfig {
+    private static RestTemplate baseRestTemplate;
     private static RestTemplate restTemplate;
+    private static RestTemplate restIOSTemplate;
     private static RedisUtils redisUtils;
     private static TagService tagService;
     private static EcardService ecardService;
@@ -48,8 +53,14 @@ public class RestConfig {
     private static String codeFolder;
     /** 阿里云API的文件后缀 */
     private static String suffix;
+    private static String qcodeSuffix;
+    private static String qcodeFolder;
     /** github Token */
     private static String token;
+    /** APPID*/
+    private static String appId;
+    /** Secret */
+    private static String appSecret;
 
     public static EcardService getEcardService() {
         return ecardService;
@@ -71,7 +82,7 @@ public class RestConfig {
         simpleClientHttpRequestFactory.setConnectTimeout(60 * 1000);
         simpleClientHttpRequestFactory.setReadTimeout(60 * 1000);
         HttpClient httpClient = HttpClientBuilder.create()
-                .setRedirectStrategy(new LaxRedirectStrategy())
+                .setRedirectStrategy(new MyRedirectStrategy())
 //                .setProxy(new HttpHost("127.0.0.1",8888))
                 .setDefaultCookieStore(new MyCookieStore())
                 .build();
@@ -85,6 +96,31 @@ public class RestConfig {
         restTemplate.setRequestFactory(httpRequestFactory);
         this.restTemplate = restTemplate;
 
+    }
+
+    public static RestTemplate getRestIOSTemplate() {
+        /** 设置超时时间 */
+        return restIOSTemplate;
+    }
+
+    @Autowired(required = true)
+    public void setRestIOSTemplate(RestTemplate restIOSTemplate) {
+        List<HttpMessageConverter<?>> converters = restIOSTemplate.getMessageConverters();
+        FormHttpMessageConverter fc = new FormHttpMessageConverter();
+        fc.setCharset(Charset.forName("ISO-8859-1"));
+        converters.add(1,fc);
+        /** 设置超时时间 */
+        restIOSTemplate.setMessageConverters(converters);
+        this.restIOSTemplate = restIOSTemplate;
+    }
+
+    public static RestTemplate getBaseRestTemplate() {
+        return baseRestTemplate;
+    }
+
+    @Autowired(required = true)
+    public void setBaseRestTemplate(RestTemplate baseRestTemplate) {
+        this.baseRestTemplate = baseRestTemplate;
     }
 
     @Autowired(required = true)
@@ -121,7 +157,15 @@ public class RestConfig {
     public static TagService getTagService() {
         return tagService;
     }
+    @Value("${wx.xcx.appid}")
+    public void setAppId(String appid){
+        this.appId = appid;
+    }
 
+    @Value("${wx.xcx.appsecret}")
+    public void setAppSecret(String appSecret){
+        this.appSecret = appSecret;
+    }
 
     @Value("${github.token}")
     public void setToken(String token) {
@@ -148,6 +192,24 @@ public class RestConfig {
         this.suffix = suffix;
     }
 
+    @Value("${aliyun.oss.qcodesuffix}")
+    public void setQcodeSuffix(String qcodesuffix) {
+        this.qcodeSuffix = qcodesuffix;
+    }
+
+    @Value("${aliyun.oss.qcodefolder}")
+    public void setQcodeFolder(String qcodefolder) {
+        this.qcodeFolder = qcodefolder;
+    }
+
+    public static String getQcodeSuffix() {
+        return qcodeSuffix;
+    }
+
+    public static String getQcodeFolder() {
+        return qcodeFolder;
+    }
+
     public static String getBucketName() {
         return bucketName;
     }
@@ -166,5 +228,13 @@ public class RestConfig {
 
     public static String getToken() {
         return token;
+    }
+
+    public static String getAppId() {
+        return appId;
+    }
+
+    public static String getAppSecret() {
+        return appSecret;
     }
 }

@@ -20,4 +20,6 @@ public interface WechatService extends IService<Wechat> {
     Wechat selectByUserId(String userId);
 
     void addOtherData(Wechat wechat, String result) throws JSONException;
+
+    void delWechat(Integer userId);
 }

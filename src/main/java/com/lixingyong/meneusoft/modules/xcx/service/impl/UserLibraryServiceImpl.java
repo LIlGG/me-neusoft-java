@@ -74,4 +74,9 @@ public class UserLibraryServiceImpl extends ServiceImpl<UserLibraryDao, UserLibr
         map.put("verify", 1);
         return this.baseMapper.selectList(new EntityWrapper<UserLibrary>().allEq(map)).get(0);
     }
+
+    @Override
+    public void delUserLibraryInfo(Integer userId) {
+        this.baseMapper.delete(new EntityWrapper<UserLibrary>().eq("user_id", userId));
+    }
 }

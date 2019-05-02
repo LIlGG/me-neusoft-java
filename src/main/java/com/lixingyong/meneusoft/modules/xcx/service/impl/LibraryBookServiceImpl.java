@@ -48,10 +48,6 @@ public class LibraryBookServiceImpl extends ServiceImpl<LibraryBookDao, LibraryB
 
     @Override
     public BookSearchVO searchBook(Map<String, Object> params) throws WSExcetpion {
-        // 登录VPN
-        if(!LoginUtil.exeVpnLogin()){
-            return null;
-        }
         if(!params.get("keyword").equals("") && null != params.get("keyword")){
             // 执行搜索功能
             BookSearchVO books =  LibraryUtil.bookSearch((String)params.get("keyword"),Integer.valueOf(params.get("cur_page").toString()));
@@ -69,5 +65,10 @@ public class LibraryBookServiceImpl extends ServiceImpl<LibraryBookDao, LibraryB
         }
         DetailBookVO detailBookVO = LibraryUtil.detailBook(detailId);
         return detailBookVO;
+    }
+
+    @Override
+    public void delLibraryAll(Integer userId) {
+        this.baseMapper.delete(new EntityWrapper<LibraryBook>().eq("user_id", userId));
     }
 }

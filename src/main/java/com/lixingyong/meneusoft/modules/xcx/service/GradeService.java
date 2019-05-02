@@ -12,4 +12,6 @@ public interface GradeService extends IService<Grade> {
     List<Grade> getGradeList(Integer valueOf);
 
     void insertOrUpdateGrades(List<Grade> grades);
+
+    void delGradeAll(Integer userId);
 }

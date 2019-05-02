@@ -15,4 +15,6 @@ public interface LibraryBookService extends IService<LibraryBook> {
     BookSearchVO searchBook(Map<String, Object> params);
 
     DetailBookVO getBookDetail(String detailId);
+
+    void delLibraryAll(Integer valueOf);
 }
