@@ -13,6 +13,7 @@ import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import javax.validation.Valid;
 import java.util.List;
 
 @Api("失物招领")
@@ -38,9 +39,8 @@ public class LostFindController {
     @ApiOperation("新建失物招领")
     @PostMapping("/lost_find")
     @Token
-    public R newLostFind(LostFind lostFind, @LoginUser String userId){
+    public R newLostFind(@Valid LostFind lostFind, @LoginUser String userId){
         try {
-            ValidatorUtils.validateEntity(lostFind);
             // 查找当前用户昵称
             lostFind.setUserId(Integer.valueOf(userId));
             lostFind.setStatus(1);

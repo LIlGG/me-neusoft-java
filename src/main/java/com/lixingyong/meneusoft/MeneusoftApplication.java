@@ -4,6 +4,7 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
 import org.springframework.scheduling.annotation.EnableScheduling;
+import org.springframework.validation.beanvalidation.MethodValidationPostProcessor;
 import org.springframework.web.client.RestTemplate;
 @EnableScheduling
 @SpringBootApplication
@@ -29,6 +30,11 @@ public class MeneusoftApplication {
 
         }
         return restTemplate;
+    }
+
+    @Bean
+    public MethodValidationPostProcessor methodValidationPostProcessor(){
+        return new MethodValidationPostProcessor();
     }
 
 }

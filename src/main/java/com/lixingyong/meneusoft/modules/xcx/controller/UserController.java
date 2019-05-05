@@ -6,6 +6,7 @@ import com.lixingyong.meneusoft.common.exception.WSExcetpion;
 import com.lixingyong.meneusoft.common.interceptor.AuthorizationInterceptor;
 import com.lixingyong.meneusoft.common.utils.JwtUtils;
 import com.lixingyong.meneusoft.common.utils.R;
+import com.lixingyong.meneusoft.common.validator.Assert;
 import com.lixingyong.meneusoft.modules.xcx.annotation.LoginUser;
 import com.lixingyong.meneusoft.modules.xcx.annotation.Token;
 import com.lixingyong.meneusoft.modules.xcx.entity.LibraryBook;
@@ -21,10 +22,13 @@ import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import io.swagger.models.auth.In;
 import lombok.extern.java.Log;
+import org.hibernate.validator.constraints.Length;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.validation.constraints.NotBlank;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -37,6 +41,7 @@ import java.util.Map;
  */
 @Api("用户")
 @RestController
+@Validated
 public class UserController {
     @Autowired
     private WechatService wechatService;
@@ -82,8 +87,9 @@ public class UserController {
     @ApiOperation("绑定统一认证中心")
     @PostMapping("/bind")
     @Token
-    public R bind(@RequestParam("student_id") String account, @RequestParam("password") String password, @LoginUser String userId){
+    public R bind(@NotBlank(message = "账号不能为空") @Length(min = 6, message = "账号不合法") @RequestParam("student_id") String account, @NotBlank(message = "密码不能为空") @Length(min = 3, message = "密码不合法") @RequestParam("password") String password, @LoginUser String userId){
         try {
+
             userService.insertOrUpdateUfsAccount(account,password, userId);
         }catch (NullPointerException e){
             return R.error("当前用户不存在或账号密码为空");
@@ -96,7 +102,7 @@ public class UserController {
     @Token
     @ApiOperation("绑定教务处")
     @PostMapping("/jwc/bind")
-    public R jwcBind(@RequestParam String student_id, @RequestParam String password,@RequestParam String vcode, @LoginUser String userId){
+    public R jwcBind(@NotBlank(message = "账号不能为空") @Length(min = 6, message = "账号不合法") @RequestParam String student_id,@NotBlank(message = "密码不能为空") @Length(min = 3, message = "密码不合法") @RequestParam String password,@RequestParam String vcode, @LoginUser String userId){
         try {
             // 更新或新增当前用户的教务处账号和密码
             userService.insertOrUpdateJwcAccount(userId,student_id, password, vcode);
@@ -112,7 +118,7 @@ public class UserController {
     @Token
     @ApiOperation("绑定图书馆")
     @PostMapping("/library/bind")
-    public R library(@RequestParam String student_id, @RequestParam String password, @LoginUser String userId){
+    public R library(@NotBlank(message = "账号不能为空") @Length(min = 6, message = "账号不合法") @RequestParam String student_id,@NotBlank(message = "密码不能为空") @Length(min = 2, message = "密码不合法") @RequestParam String password, @LoginUser String userId){
         // 更新或新增当前用户的图书馆账号和密码
         try {
             userLibraryService.insertOrUpdateLibraryAccount(userId,student_id,password);
@@ -127,7 +133,7 @@ public class UserController {
     @Token
     @ApiOperation("绑定一卡通")
     @PostMapping("/ecard/bind")
-    public R eCardBind(@RequestParam String  result,@LoginUser String userId){
+    public R eCardBind(@NotBlank(message = "绑定失败") @RequestParam String  result,@LoginUser String userId){
         try {
             //截取最后的id
             if(result.startsWith("http")){
@@ -137,7 +143,7 @@ public class UserController {
                 userService.insertOrUpdateEcardInfo(userId, id);
                 return R.ok("绑定一卡通成功");
             } else {
-                return R.error("扫码数据不正确");
+                return R.error("二维码数据不正确");
             }
         }catch (WSExcetpion e){
             return R.error(e.getMsg());

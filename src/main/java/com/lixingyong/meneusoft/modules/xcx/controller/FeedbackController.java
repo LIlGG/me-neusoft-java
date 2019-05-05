@@ -3,6 +3,8 @@ package com.lixingyong.meneusoft.modules.xcx.controller;
 import com.lixingyong.meneusoft.api.github.GitHubUtil;
 import com.lixingyong.meneusoft.common.exception.WSExcetpion;
 import com.lixingyong.meneusoft.common.utils.R;
+import com.lixingyong.meneusoft.common.validator.Assert;
+import com.lixingyong.meneusoft.common.validator.ValidatorUtils;
 import com.lixingyong.meneusoft.modules.xcx.annotation.LoginUser;
 import com.lixingyong.meneusoft.modules.xcx.annotation.Token;
 import com.lixingyong.meneusoft.modules.xcx.entity.Feedback;
@@ -13,12 +15,16 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
+import javax.validation.Valid;
+import javax.validation.constraints.NotBlank;
 import java.util.List;
 import java.util.Map;
 @Api("用户反馈")
 @RestController
+@Validated
 public class FeedbackController {
     @Autowired
     private FeedbackService feedbackService;
@@ -50,7 +56,7 @@ public class FeedbackController {
     @ApiOperation("新增一条反馈信息")
     @PostMapping("/feedback")
     @Token
-    public R setFeedback(@ModelAttribute FeedBackParam params, @LoginUser String userId){
+    public R setFeedback(@ModelAttribute @Valid FeedBackParam params, @LoginUser String userId){
         // 验证用户的反馈频率，每人每天最多反馈五条
         int count = feedbackService.frequencyValidate(Integer.valueOf(userId));
         if(count >= 5){
@@ -74,7 +80,7 @@ public class FeedbackController {
     @ApiOperation("新增一条反馈评论 :id 为反馈的id")
     @PostMapping("/feedback/comment/{id}")
     @Token
-    public R setFeedbackComment(@PathVariable("id") String issueId, @RequestParam("content") String  content){
+    public R setFeedbackComment(@PathVariable("id") String issueId,@NotBlank(message = "评论内容不能为空") @RequestParam("content") String  content){
         if(GitHubUtil.addIssueComment(issueId, content)){
             return R.ok("发布评论成功");
         }
