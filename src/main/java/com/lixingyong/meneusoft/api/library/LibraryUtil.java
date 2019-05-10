@@ -10,6 +10,7 @@ import com.lixingyong.meneusoft.modules.xcx.vo.BookSearchVO;
 import com.lixingyong.meneusoft.modules.xcx.vo.CollectBook;
 import com.lixingyong.meneusoft.modules.xcx.vo.DetailBookVO;
 import com.lixingyong.meneusoft.modules.xcx.vo.SearchBooksVO;
+import org.apache.commons.lang.StringUtils;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
@@ -39,10 +40,10 @@ public class LibraryUtil extends LibraryAbs {
      * @Param [uid]
      * @return void
      **/
-    public static void libraryLogin(long uid, String barcode, String password){
+    public static void libraryLogin(long uid, String barcode, String password) throws WSExcetpion{
         setCookies(new LinkedList<>());
         HttpHeaders headers = httpHeaders();
-        headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
+        headers.set("Content-Type","application/x-www-form-urlencoded;charset=ISO-8859-1");
         // 判断redis中是否存着对应的Cookie
         MultiValueMap<String,String> param = new LinkedMultiValueMap<>();
         param.add("barcode", barcode);
@@ -50,8 +51,19 @@ public class LibraryUtil extends LibraryAbs {
         param.add("login.x",Integer.toString(0));
         param.add("login.y", Integer.toString(0));
         HttpEntity<MultiValueMap<String,String>> request = new HttpEntity<>(param,headers);//将参数和header组成一个请求
-        ResponseEntity<Resource> responseEntity = restTemplate.exchange(URL(LibraryAPI.LIBRARY_LOGIN),HttpMethod.POST,request,Resource.class, getMap());
+        ResponseEntity<String> responseEntity = restTemplate.exchange(URL(LibraryAPI.LIBRARY_LOGIN),HttpMethod.POST,request,String.class, getMap());
         if(responseEntity.getStatusCode().is2xxSuccessful()){
+            try {
+                String html = new String(responseEntity.getBody().getBytes("ISO-8859-1"),"GBK");
+                if(html.contains("alert")){
+                    String[] m = html.split("alert");
+                    String msgErrpr = m[1].substring(m[1].indexOf("\"") + 1, m[1].indexOf(")") - 1);
+                    if(StringUtils.isNotBlank(msgErrpr))
+                        throw new WSExcetpion(msgErrpr,30010);
+                }
+            } catch (UnsupportedEncodingException e) {
+               throw new WSExcetpion("服务器错误，请联系管理员", 30099);
+            }
             if(responseEntity.getHeaders().containsKey("Set-Cookie")){
                 if(responseEntity.getHeaders().get("Set-Cookie").size() > 0){
                     if(responseEntity.getHeaders().get("Set-Cookie").get(0).startsWith("JSESSIONID")){
@@ -75,7 +87,7 @@ public class LibraryUtil extends LibraryAbs {
      * @Param [restTemplate]
      * @return void
      **/
-    public static List<LibraryBook> getHistoryBooks(long uid){
+    public static List<LibraryBook> getHistoryBooks(long uid) throws WSExcetpion{
         setCookies(new LinkedList<>());
         setCookies(uid+"LIBARARYSESSION");
         HttpEntity request = httpEntity();

@@ -89,12 +89,11 @@ public class UserController {
     @Token
     public R bind(@NotBlank(message = "账号不能为空") @Length(min = 6, message = "账号不合法") @RequestParam("student_id") String account, @NotBlank(message = "密码不能为空") @Length(min = 3, message = "密码不合法") @RequestParam("password") String password, @LoginUser String userId){
         try {
-
             userService.insertOrUpdateUfsAccount(account,password, userId);
         }catch (NullPointerException e){
             return R.error("当前用户不存在或账号密码为空");
         } catch (WSExcetpion e){
-            return R.error(e.getMsg());
+            return R.error(e.getCode(), e.getMsg());
         }
         return R.ok("绑定UFS成功");
     }

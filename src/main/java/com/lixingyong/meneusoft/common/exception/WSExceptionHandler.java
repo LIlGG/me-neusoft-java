@@ -2,12 +2,14 @@ package com.lixingyong.meneusoft.common.exception;
 
 import com.lixingyong.meneusoft.common.utils.R;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.http.impl.bootstrap.HttpServer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.validation.BindException;
 import org.springframework.validation.ObjectError;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.client.HttpServerErrorException;
 import org.springframework.web.servlet.NoHandlerFoundException;
 import org.springframework.dao.DuplicateKeyException;
 
@@ -30,11 +32,8 @@ public class WSExceptionHandler {
 
     @ExceptionHandler(value = WSExcetpion.class)
     public R handleWSException(WSExcetpion e){
-        R r = new R();
-        r.put("code", e.getCode());
-        r.put("msg", e.getMessage());
         log.error(e.getMessage(), e);
-        return r;
+        return R.error(e.getCode(), e.getMsg());
     }
 
     @ExceptionHandler(value = NullPointerException.class)
@@ -79,5 +78,11 @@ public class WSExceptionHandler {
         Set<ConstraintViolation<?>> constraintViolations = e.getConstraintViolations();
         log.error(constraintViolations.iterator().next().getMessage(), e);
         return R.error(constraintViolations.iterator().next().getMessage());
+    }
+
+    @ExceptionHandler(HttpServerErrorException.class)
+    public R handlerHSEException(HttpServerErrorException e){
+        log.error(e.getMessage(), e);
+        return R.error("教学系统出现异常，请联系管理员！");
     }
 }

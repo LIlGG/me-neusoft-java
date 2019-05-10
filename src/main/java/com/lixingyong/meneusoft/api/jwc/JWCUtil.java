@@ -155,7 +155,6 @@ public class JWCUtil extends JWCAbs {
             return;
         }
         throw new WSExcetpion("获取教务处登录信息失败");
-
     }
 
     /**

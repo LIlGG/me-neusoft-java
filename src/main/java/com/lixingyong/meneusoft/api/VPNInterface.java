@@ -9,6 +9,7 @@ import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.web.client.RestTemplate;
 
+import java.net.InetSocketAddress;
 import java.util.*;
 
 public abstract class VPNInterface {
@@ -20,6 +21,10 @@ public abstract class VPNInterface {
     protected static Logger logger = LoggerFactory.getLogger(VPNInterface.class);
 
 
+    /**
+     * 修改restTemplate
+     */
+
 
     /**
      * 获取HttpHeaders
@@ -29,7 +34,6 @@ public abstract class VPNInterface {
         httpHeaders.put(HttpHeaders.COOKIE,getCookies());
         return httpHeaders;
     }
-
     /**
      * 根据是否为VPN登录，设置不同的URL
      * @return

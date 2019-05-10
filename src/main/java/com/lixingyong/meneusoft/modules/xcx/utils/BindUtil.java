@@ -4,6 +4,7 @@ import com.lixingyong.meneusoft.api.bind.Type;
 import com.lixingyong.meneusoft.api.evaluate.EvaluateUtil;
 import com.lixingyong.meneusoft.api.jwc.JWCUtil;
 import com.lixingyong.meneusoft.api.library.LibraryUtil;
+import com.lixingyong.meneusoft.common.exception.WSExcetpion;
 
 /**
  * @ClassName com.lixingyong.meneusoft.modules.xcx.utils
@@ -20,22 +21,20 @@ public class BindUtil {
      * @Param [account, pw, vCode]
      * @return boolean
      **/
-    public static boolean accountStatus(String user_id, String account, String pw, String vCode, Type type){
+    public static void accountStatus(String user_id, String account, String pw, String vCode, Type type) throws WSExcetpion{
         // 执行登录程序
         switch (type){
             case JWC:
                 // 执行教务处登录程序
                 JWCUtil.jwcStudentLogin(Long.parseLong(user_id), account, pw, vCode);
-                return true;
+                break;
             case Bind:
                 // 执行登录统一身份认证程序(使用课程评价系统测试)
-                if(EvaluateUtil.ufsLogin(Long.parseLong(user_id), account, pw)){
-                    return true;
-                }
+                EvaluateUtil.ufsLogin(Long.parseLong(user_id), account, pw);
+                break;
             case LIBRARY:
                 LibraryUtil.libraryLogin(Long.parseLong(user_id),account,pw);
-                return true;
+                break;
         }
-        return false;
     }
 }

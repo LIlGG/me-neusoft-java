@@ -28,7 +28,7 @@ public class AuthorizationInterceptor extends HandlerInterceptorAdapter {
 
     public static final String USER_KEY = "user_id";
     @Override
-    public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
+    public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) {
         Token annotation;
         if(handler instanceof HandlerMethod) {
             annotation = ((HandlerMethod) handler).getMethodAnnotation(Token.class);
@@ -48,18 +48,18 @@ public class AuthorizationInterceptor extends HandlerInterceptorAdapter {
 
         //凭证为空
         if(StringUtils.isBlank(token)){
-            throw new WSExcetpion(jwtUtils.getHeader() + "不能为空", HttpStatus.UNAUTHORIZED.value());
+            throw new WSExcetpion("验证信息不存在", HttpStatus.UNAUTHORIZED.value());
         }
 
         //凭证不是Bearer开头的
         if(!StringUtils.startsWith(token,"Bearer")){
-            throw new WSExcetpion(jwtUtils.getHeader() +"不正确", HttpStatus.UNAUTHORIZED.value());
+            throw new WSExcetpion("验证信息不正确，请重新登录", HttpStatus.UNAUTHORIZED.value());
         }
 
         token = StringUtils.substring(token,token.indexOf(" ")+1);
         Claims claims = jwtUtils.getClaimByToken(token);
         if(claims == null || jwtUtils.isTokenExpired(claims.getExpiration())){
-            throw new WSExcetpion(jwtUtils.getHeader() + "失效，请重新登录", HttpStatus.UNAUTHORIZED.value());
+            throw new WSExcetpion("验证信息失效，请重新登录", HttpStatus.UNAUTHORIZED.value());
         }
         //设置userId到request里，后续根据userId，获取用户信息
         request.setAttribute(USER_KEY, Long.parseLong(claims.get("user_id").toString()));

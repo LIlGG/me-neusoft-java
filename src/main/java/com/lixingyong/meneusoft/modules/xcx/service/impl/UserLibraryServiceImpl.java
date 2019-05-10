@@ -46,18 +46,14 @@ public class UserLibraryServiceImpl extends ServiceImpl<UserLibraryDao, UserLibr
     @Override
     public void insertOrUpdateLibraryAccount(String userId, String student_id, String password) throws WSExcetpion {
         // 判断图书馆账号是否可以使用
-        boolean usable =  BindUtil.accountStatus(userId, student_id, password,null,Type.LIBRARY);
-        if(usable){
-            // 保存当前账号
-            UserLibrary userLibrary = new UserLibrary();
-            userLibrary.setUserId(Integer.valueOf(userId));
-            userLibrary.setStudentId(student_id);
-            userLibrary.setPassword(password);
-            userLibrary.setVerify(1);
-            this.baseMapper.update(userLibrary, new EntityWrapper<UserLibrary>().eq("user_id",userLibrary.getUserId()));
-        } else {
-            throw new WSExcetpion("图书馆登录失败，请稍候再试");
-        }
+        BindUtil.accountStatus(userId, student_id, password,null,Type.LIBRARY);
+        // 保存当前账号
+        UserLibrary userLibrary = new UserLibrary();
+        userLibrary.setUserId(Integer.valueOf(userId));
+        userLibrary.setStudentId(student_id);
+        userLibrary.setPassword(password);
+        userLibrary.setVerify(1);
+        this.baseMapper.update(userLibrary, new EntityWrapper<UserLibrary>().eq("user_id",userLibrary.getUserId()));
     }
 
     /**

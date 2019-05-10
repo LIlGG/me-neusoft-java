@@ -72,6 +72,7 @@ public class GradeController {
                 break;
             }
         }
+        gradeService.delGradeAll(user.getId());
         // 保存信息
         gradeService.insertOrUpdateGrades(grades);
         // 登出系统，删除cookie

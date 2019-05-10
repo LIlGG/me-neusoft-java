@@ -29,7 +29,7 @@ public class NoticesController {
         if(notices.size() >  0){
             return R.ok(notices);
         }
-        return R.error(501,"轮播信息不存在");
+        return R.error(301,"轮播信息不存在");
     }
 
     @ApiOperation("获取id=:id的通知详情")
@@ -39,7 +39,7 @@ public class NoticesController {
         if( null != notice){
             return R.ok(notice);
         }
-        return R.error(503,"查询通知详情失败");
+        return R.error(303,"查询通知详情失败");
     }
 
     @ApiOperation("获取最新通知公告，这个通知会全局弹窗展示")
@@ -49,7 +49,7 @@ public class NoticesController {
         if(null != notice){
             return R.ok(notice);
         }
-        return R.error(502,"无最新公告");
+        return R.error(302,"无最新公告");
     }
 
 }

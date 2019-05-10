@@ -8,15 +8,9 @@ import com.lixingyong.meneusoft.modules.xcx.service.TagService;
 import com.lixingyong.meneusoft.modules.xcx.service.UserService;
 import org.apache.http.HttpHost;
 import org.apache.http.client.HttpClient;
-import org.apache.http.client.params.ClientPNames;
-import org.apache.http.client.params.CookiePolicy;
-import org.apache.http.impl.client.BasicCookieStore;
 import org.apache.http.impl.client.HttpClientBuilder;
-import org.apache.http.impl.client.LaxRedirectStrategy;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.MediaType;
 import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
 import org.springframework.http.client.SimpleClientHttpRequestFactory;
 import org.springframework.http.converter.FormHttpMessageConverter;
@@ -27,7 +21,6 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
 
 import java.nio.charset.Charset;
-import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -70,6 +63,8 @@ public class RestConfig {
     private void setRestTemplate(RestTemplate restTemplate){
         List<HttpMessageConverter<?>> converters = restTemplate.getMessageConverters();
         converters.remove(1);
+        converters.remove(2);
+        converters.remove(3);
         HttpMessageConverter<?> converter = new StringHttpMessageConverter(Charset.forName("UTF-8"));
         FormHttpMessageConverter fc = new FormHttpMessageConverter();
         MappingJackson2HttpMessageConverter mc = new MappingJackson2HttpMessageConverter();

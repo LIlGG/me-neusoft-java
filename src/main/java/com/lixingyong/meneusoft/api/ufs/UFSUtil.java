@@ -15,6 +15,7 @@ import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
 
+import java.net.InetSocketAddress;
 import java.util.*;
 
 /**
@@ -25,7 +26,7 @@ public class UFSUtil  extends UFSAbs{
     /**
      * 获取会话cookie
      */
-    private static String getCookie(){
+    private static String getCookie() throws WSExcetpion {
         setCookies(new LinkedList<>());
         HttpEntity request = httpEntity();
         ResponseEntity<String> responseEntity = restTemplate.exchange(URL(UFSAPI.LOGIN), HttpMethod.GET,request,String.class, getMap());
@@ -42,7 +43,7 @@ public class UFSUtil  extends UFSAbs{
     /**
      * 执行登录UFS系统
      */
-    public static boolean LoginUFS(int userId, String account, String pw){
+    public static boolean LoginUFS(int userId, String account, String pw)  throws WSExcetpion{
                 // 若cookie中存在当前cookie,则执行注销程序
         if(redisUtils.hasKey(userId+"UFS")){
             // 执行注销程序
@@ -58,7 +59,8 @@ public class UFSUtil  extends UFSAbs{
         cookieList.add(cookie);
         setCookies(cookieList);
         HttpHeaders headers = httpHeaders();
-        headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
+        //headers.setHost(InetSocketAddress.createUnresolved(HOST(),80));
+        headers.set("Content-Type","application/x-www-form-urlencoded;charset=GBK");
         // 将cookie放入header
         MultiValueMap<String,String> param = new LinkedMultiValueMap<>();
         param.add("username", account);
@@ -81,7 +83,7 @@ public class UFSUtil  extends UFSAbs{
     /**
      * 查询当前用户身份(查询年份)
      */
-    public static String baseInfo(int userId){
+    public static String baseInfo(int userId) throws WSExcetpion{
         setCookies(new LinkedList<>());
         loginVail(userId);
         HttpEntity request = vailHttpEntity(userId);
@@ -103,7 +105,7 @@ public class UFSUtil  extends UFSAbs{
     /**
      * 获取至今为止所有的学年
      */
-    public static List<String> schoolYear(int userId){
+    public static List<String> schoolYear(int userId) throws WSExcetpion{
         setCookies(new LinkedList<>());
         List<String> schoolYears = new ArrayList<>();
         loginVail(userId);
@@ -125,13 +127,13 @@ public class UFSUtil  extends UFSAbs{
     /**
      * 根据学期和学年获取成绩信息
      */
-    public static List<Grade> getGradeList(String courseYear, int term, int userId){
+    public static List<Grade> getGradeList(String courseYear, int term, int userId) throws WSExcetpion {
         List<Grade> grades = new ArrayList<>();
         setCookies(new LinkedList<>());
         loginVail(userId);
         setCookies(userId+"UFS");
         HttpHeaders headers = httpHeaders();
-        headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
+        headers.set("Content-Type","application/x-www-form-urlencoded;charset=GBK");
         //登录前首先获取本次登录所需cookie
         MultiValueMap<String, String> params = new LinkedMultiValueMap<>();
         String studentId = userService.getUserInfo(userId).getStudentId();
@@ -161,7 +163,7 @@ public class UFSUtil  extends UFSAbs{
         return grades;
     }
 
-    private static List<Grade> dealGradeList(String courseYear, int term, int userId, Element gradeList, String studentId ) {
+    private static List<Grade> dealGradeList(String courseYear, int term, int userId, Element gradeList, String studentId )  throws WSExcetpion {
         List<Grade> grades = new ArrayList<>();
         Elements trs = gradeList.select("tr");
         for(int i = 1; i < trs.size(); i++){
@@ -207,7 +209,7 @@ public class UFSUtil  extends UFSAbs{
      * @param session
      * @return
      */
-    public static boolean logout(String session) {
+    public static boolean logout(String session)  throws WSExcetpion{
         // 将cookie放入header
         List<String> cookieList = new ArrayList<>();
         cookieList.add(session);
@@ -239,7 +241,7 @@ public class UFSUtil  extends UFSAbs{
             User user = userService.getUserInfo(userId);
             if(user.getVerify() == 1){
                 if(!LoginUFS(userId, user.getStudentId(), user.getPassword())){
-                    throw new WSExcetpion("登录UFS系统失败");
+                    throw new WSExcetpion("登录UFS系统失败，请重新绑定", 501);
                 }
             }else {
                 throw new WSExcetpion("当前用户账号不存在或不可登录");

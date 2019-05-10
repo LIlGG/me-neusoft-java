@@ -8,6 +8,7 @@ import com.lixingyong.meneusoft.modules.xcx.entity.User;
 import com.lixingyong.meneusoft.modules.xcx.service.UserService;
 import com.lixingyong.meneusoft.modules.xcx.vo.Evaluate;
 import com.lixingyong.meneusoft.modules.xcx.vo.EvaluatesVO;
+import org.apache.commons.lang.StringUtils;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
@@ -67,7 +68,7 @@ public class EvaluateUtil extends EvaluateAbs {
      * @param account
      * @param pw
      */
-    public static boolean ufsLogin(long userId, String account, String pw) {
+    public static boolean ufsLogin(long userId, String account, String pw) throws WSExcetpion {
         // 若cookie中存在当前cookie,则执行注销程序
         if(redisUtils.hasKey(userId+"EVALUATE_COOKIE")){
             // 执行注销程序
@@ -90,7 +91,11 @@ public class EvaluateUtil extends EvaluateAbs {
         HttpEntity<MultiValueMap<String,String>> request = new HttpEntity<>(param,headers);//将参数和header组成一个请求
         ResponseEntity<Map> response = restTemplate.exchange(URL(EvaluateAPI.EVALUATE_LOGIN),HttpMethod.POST,request,Map.class, getMap());
         if(response.getStatusCode().is2xxSuccessful()){
-            if((boolean)response.getBody().get("success")){
+            String errorMsg = response.getBody().get("errorMsg").toString();
+            if(StringUtils.isNotBlank(errorMsg)){
+                throw new WSExcetpion(errorMsg,21001);
+            }
+            if(response.getBody().get("success").toString().equals("true")){
                 // 将当前cookie保存
                 redisUtils.set(userId+"EVALUATE_COOKIE",cookie);
                 return true;

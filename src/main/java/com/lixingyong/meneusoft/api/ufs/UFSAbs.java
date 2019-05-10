@@ -16,6 +16,13 @@ public abstract class UFSAbs extends VPNInterface {
         return isVPN() ? VPNAPI.PROXY + UFSAPI.UFS_VPN + url :  UFSAPI.UFS + url;
     }
 
+    protected static String HOST() throws WSExcetpion{
+        if(isVPN()){
+            return "vpn.neusoft.edu.cn";
+        }
+        return "ufs.neusoft.edu.cn";
+    }
+
     /**
      * 执行有登录验证的方法
      * @return

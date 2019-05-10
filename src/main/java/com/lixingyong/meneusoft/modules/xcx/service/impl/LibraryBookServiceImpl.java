@@ -11,6 +11,7 @@ import com.lixingyong.meneusoft.modules.xcx.service.LibraryBookService;
 import com.lixingyong.meneusoft.modules.xcx.utils.LoginUtil;
 import com.lixingyong.meneusoft.modules.xcx.vo.BookSearchVO;
 import com.lixingyong.meneusoft.modules.xcx.vo.DetailBookVO;
+import org.apache.commons.lang.StringUtils;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -27,11 +28,6 @@ import java.util.Map;
 public class LibraryBookServiceImpl extends ServiceImpl<LibraryBookDao, LibraryBook> implements LibraryBookService {
     @Override
     public List<LibraryBook> getBooks(UserLibrary userLibrary, int isHistory) {
-
-        // 登录VPN
-        if(!LoginUtil.exeVpnLogin()){
-            return null;
-        }
         // 执行登录图书馆
         LibraryUtil.libraryLogin((long) userLibrary.getUserId(), userLibrary.getStudentId(), userLibrary.getPassword());
         // 首先获取图书馆系统中的最新信息
@@ -48,7 +44,11 @@ public class LibraryBookServiceImpl extends ServiceImpl<LibraryBookDao, LibraryB
 
     @Override
     public BookSearchVO searchBook(Map<String, Object> params) throws WSExcetpion {
-        if(!params.get("keyword").equals("") && null != params.get("keyword")){
+        String keyword = (String) params.get("keyword");
+        if(StringUtils.isNotBlank(keyword)){
+            if(keyword.length() < 3){
+                throw new WSExcetpion("书名检索长度需大于2");
+            }
             // 执行搜索功能
             BookSearchVO books =  LibraryUtil.bookSearch((String)params.get("keyword"),Integer.valueOf(params.get("cur_page").toString()));
             return books;

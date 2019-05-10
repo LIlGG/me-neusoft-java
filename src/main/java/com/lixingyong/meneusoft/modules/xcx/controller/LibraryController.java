@@ -12,6 +12,7 @@ import com.lixingyong.meneusoft.modules.xcx.vo.BookSearchVO;
 import com.lixingyong.meneusoft.modules.xcx.vo.DetailBookVO;
 import io.micrometer.core.instrument.search.Search;
 import io.swagger.annotations.Api;
+import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -47,14 +48,15 @@ public class LibraryController {
         userLibrary.setUserId(Integer.valueOf(userId));
         try {
             userLibrary = userLibraryService.getUserAccount(userLibrary);
-            if(null != userLibrary.getStudentId() && !userLibrary.getStudentId().equals("")){
+            if(StringUtils.isNotBlank(userLibrary.getStudentId()) && userLibrary.getVerify() == 1){
                 List<LibraryBook> list = libraryBookService.getBooks(userLibrary, isHistory);
                 return R.ok(list);
+            } else {
+                return R.error(401,"图书管理系统登录失败，请重新登录");
             }
         }catch (WSExcetpion e){
             return R.error(e.getMsg());
         }
-        return R.error();
     }
 
     /**
