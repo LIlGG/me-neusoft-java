@@ -3,13 +3,12 @@ package com.lixingyong.meneusoft.api;
 import com.lixingyong.meneusoft.common.exception.WSExcetpion;
 import com.lixingyong.meneusoft.common.utils.RedisUtils;
 import com.lixingyong.meneusoft.modules.xcx.utils.LoginUtil;
-import org.apache.pdfbox.jbig2.util.log.Logger;
-import org.apache.pdfbox.jbig2.util.log.LoggerFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.web.client.RestTemplate;
 
-import java.net.InetSocketAddress;
 import java.util.*;
 
 public abstract class VPNInterface {

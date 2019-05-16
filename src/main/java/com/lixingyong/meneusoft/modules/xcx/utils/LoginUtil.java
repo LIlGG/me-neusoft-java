@@ -75,15 +75,10 @@ public class LoginUtil{
 
     // 连接至教务处
     public static boolean exeJWCLogin(long uid) throws WSExcetpion{
-        fiddler();
-        // 登录VPN
-        if(!exeVpnLogin()){
-            return false;
-        }
         logger.debug("用户"+uid+"执行登录教务处流程");
         try {
             JWCUtil.getJWCCookie(uid);
-            JWCUtil.getJWCInfo(uid);
+            //JWCUtil.getJWCInfo(uid);
             logger.debug("登录教务处流程执行完成");
             return true;
         }catch (WSExcetpion s){

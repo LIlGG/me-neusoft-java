@@ -16,13 +16,19 @@
 
 package com.lixingyong.meneusoft.common.utils;
 
+import com.lixingyong.meneusoft.modules.xcx.utils.Week;
 import org.apache.commons.lang.StringUtils;
 import org.joda.time.DateTime;
 import org.joda.time.LocalDate;
 import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
+import org.joda.time.format.DateTimePrinter;
 
+import java.io.Serializable;
 import java.text.SimpleDateFormat;
+import java.time.DayOfWeek;
+import java.time.temporal.Temporal;
+import java.time.temporal.WeekFields;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
@@ -219,5 +225,42 @@ public class DateUtils {
             curr.add(Calendar.MONTH, 1);
         }
         return result;
+    }
+
+    /**
+     * 根据开始时间
+     * @param startTime
+     * @param endTime
+     * @return
+     */
+    public static int getWeek(Date startTime, Date endTime) {
+        Date curTime = new Date();
+        int i  = 1;
+        Date time = startTime;
+        do{
+            if(endTime.compareTo(curTime) >= 0 && startTime.compareTo(curTime) <= 0){
+                return i;
+            }
+            if(time.compareTo(endTime) >= 0){
+                return 0;
+            }
+            i ++;
+            time = addDateWeeks(time,1);
+        }while (true);
+    }
+
+    /**
+     * 获取当前日期是星期几<br>
+     *
+     * @param date
+     * @return 当前日期是星期几
+     */
+    public static String getWeekOfDate(Date date) {
+        Calendar cal = Calendar.getInstance();
+        cal.setTime(date);
+        int w = cal.get(Calendar.DAY_OF_WEEK) - 1;
+        if (w < 0)
+            w = 0;
+        return Week.getWeekName(w);
     }
 }

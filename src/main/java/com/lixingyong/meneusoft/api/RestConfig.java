@@ -3,9 +3,7 @@ package com.lixingyong.meneusoft.api;
 import com.lixingyong.meneusoft.common.config.MyCookieStore;
 import com.lixingyong.meneusoft.common.config.MyRedirectStrategy;
 import com.lixingyong.meneusoft.common.utils.RedisUtils;
-import com.lixingyong.meneusoft.modules.xcx.service.EcardService;
-import com.lixingyong.meneusoft.modules.xcx.service.TagService;
-import com.lixingyong.meneusoft.modules.xcx.service.UserService;
+import com.lixingyong.meneusoft.modules.xcx.service.*;
 import org.apache.http.HttpHost;
 import org.apache.http.client.HttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
@@ -38,6 +36,10 @@ public class RestConfig {
     private static TagService tagService;
     private static EcardService ecardService;
     private static UserService userService;
+    private static ClassroomService classroomService;
+    private static CourseService courseService;
+
+    private static CourseScheduleService courseScheduleService;
     /** 阿里云API的bucket名称 */
     private static String bucketName;
     /** 阿里云API的文件夹名称 */
@@ -54,6 +56,8 @@ public class RestConfig {
     private static String appId;
     /** Secret */
     private static String appSecret;
+    /** tess4j 文件目录 */
+    private static String tess4jData;
 
     public static EcardService getEcardService() {
         return ecardService;
@@ -66,6 +70,7 @@ public class RestConfig {
         converters.remove(2);
         converters.remove(3);
         HttpMessageConverter<?> converter = new StringHttpMessageConverter(Charset.forName("UTF-8"));
+
         FormHttpMessageConverter fc = new FormHttpMessageConverter();
         MappingJackson2HttpMessageConverter mc = new MappingJackson2HttpMessageConverter();
         fc.setCharset(Charset.forName("GBK"));
@@ -136,6 +141,30 @@ public class RestConfig {
         this.userService = userService;
     }
 
+    public static CourseService getCourseService() {
+        return courseService;
+    }
+    @Autowired
+    public void setCourseService(CourseService courseService) {
+        RestConfig.courseService = courseService;
+    }
+
+    public static CourseScheduleService getCourseScheduleService() {
+        return courseScheduleService;
+    }
+    @Autowired
+    public void setCourseScheduleService(CourseScheduleService courseScheduleService) {
+        RestConfig.courseScheduleService = courseScheduleService;
+    }
+
+    public static ClassroomService getClassroomService() {
+        return classroomService;
+    }
+    @Autowired
+    public void setClassroomService(ClassroomService classroomService) {
+        RestConfig.classroomService = classroomService;
+    }
+
     public static UserService getUserService() {
         return userService;
     }
@@ -195,6 +224,14 @@ public class RestConfig {
     @Value("${aliyun.oss.qcodefolder}")
     public void setQcodeFolder(String qcodefolder) {
         this.qcodeFolder = qcodefolder;
+    }
+
+    public static String getTess4jData() {
+        return tess4jData;
+    }
+    @Value("${tess4j.tess4jData}")
+    public void setTess4jData(String tess4jData) {
+        RestConfig.tess4jData = tess4jData;
     }
 
     public static String getQcodeSuffix() {

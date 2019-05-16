@@ -1,19 +1,20 @@
-package com.lixingyong.meneusoft.common.utils;
+package com.lixingyong.meneusoft.api.jwc.utils;
 
 import javax.imageio.ImageIO;
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 
 /**
- * @ClassName ImgUtils
+ * @ClassName ImgUtil
  * @Description TODO
  * @Author lixingyong
  * @Date 2018/12/7 14:18
  * @Version 1.0
  */
-public class ImgUtils {
+public class ImgUtil {
 //    public static void removeBackground(String imgUrl, String resUrl){
 //        //定义一个临界阈值
 //        int threshold = 600;
@@ -137,11 +138,10 @@ public class ImgUtils {
      *            去噪后的图像保存地址
      * @throws IOException
      */
-    public static void cleanLinesInImage(String sfile, String destDir)  throws IOException{
-        BufferedImage bufferedImage = ImageIO.read(new File(sfile));
+    public static BufferedImage cleanLinesInImage(InputStream sfile)  throws IOException{
+        BufferedImage bufferedImage = ImageIO.read(sfile);
         int h = bufferedImage.getHeight();
         int w = bufferedImage.getWidth();
-
         // 灰度化
         int[][] gray = new int[w][h];
         for (int x = 0; x < w; x++)
@@ -245,24 +245,25 @@ public class ImgUtils {
 //            }
 //            System.out.println();
 //        }
-        File file = new File(destDir);
-            if (!file.exists())
-            {
-                File dir = file.getParentFile();
-                if (!dir.exists())
-                {
-                    dir.mkdirs();
-                }
-                try
-                {
-                    file.createNewFile();
-               }
-                catch (IOException e)
-                {
-                    e.printStackTrace();
-                }
-            }
-            ImageIO.write(binaryBufferedImage, "jpg", file);
+        return binaryBufferedImage;
+//        File file = new File(destDir);
+//            if (!file.exists())
+//            {
+//                File dir = file.getParentFile();
+//                if (!dir.exists())
+//                {
+//                    dir.mkdirs();
+//                }
+//                try
+//                {
+//                    file.createNewFile();
+//               }
+//                catch (IOException e)
+//                {
+//                    e.printStackTrace();
+//                }
+//            }
+//            ImageIO.write(binaryBufferedImage, "jpg", file);
     }
 
     public static boolean isBlack(int colorInt)
