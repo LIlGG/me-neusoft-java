@@ -36,7 +36,9 @@ public class EcardUtil {
     private static Logger logger = LoggerFactory.getLogger(EcardUtil.class);
 
     public static void loginEcard(long uid, String ecardId) throws WSExcetpion {
-        HttpEntity<String> request = new HttpEntity<>(null, null);
+        HttpHeaders httpHeaders = new HttpHeaders();
+        httpHeaders.set("User-Agent","Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/74.0.3729.157 Safari/537.36");
+        HttpEntity<String> request = new HttpEntity<>(null, httpHeaders);
         map.put("ecardId",ecardId);
         ResponseEntity<Resource> responseEntity = restTemplate.exchange(EcardAPI.ECARDCOOKIE, HttpMethod.GET,request,Resource.class,map);
         if(responseEntity.getStatusCode().is3xxRedirection()){
@@ -59,6 +61,7 @@ public class EcardUtil {
 
     public static void updateEcardInfo(long uid, String ecardId) throws WSExcetpion {
         HttpHeaders headers = new HttpHeaders();
+        headers.set("User-Agent","Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/74.0.3729.157 Safari/537.36");
         /** 获取redis保存的cookies */
         if(!redisUtils.hasKey(uid+"ECARDCOOKIE")){
             // 执行登录

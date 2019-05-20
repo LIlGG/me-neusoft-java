@@ -4,6 +4,7 @@ import com.lixingyong.meneusoft.api.RestConfig;
 import com.lixingyong.meneusoft.api.VPNInterface;
 import com.lixingyong.meneusoft.api.vpn.VPNAPI;
 import com.lixingyong.meneusoft.common.exception.WSExcetpion;
+import com.lixingyong.meneusoft.modules.xcx.service.CourseService;
 import com.lixingyong.meneusoft.modules.xcx.service.UserService;
 import org.springframework.http.HttpEntity;
 
@@ -12,6 +13,7 @@ import java.util.List;
 
 public abstract class UFSAbs extends VPNInterface {
     protected static UserService userService = RestConfig.getUserService();
+    protected static CourseService courseService = RestConfig.getCourseService();
     protected static String URL(String url) throws WSExcetpion {
         return isVPN() ? VPNAPI.PROXY + UFSAPI.UFS_VPN + url :  UFSAPI.UFS + url;
     }

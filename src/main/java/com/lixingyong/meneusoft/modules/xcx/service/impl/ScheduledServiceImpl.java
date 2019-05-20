@@ -1,19 +1,22 @@
 package com.lixingyong.meneusoft.modules.xcx.service.impl;
 
+import com.baomidou.mybatisplus.plugins.Page;
 import com.lixingyong.meneusoft.api.contact.ContactUtil;
 import com.lixingyong.meneusoft.api.neusoft.NeusoftUtil;
 import com.lixingyong.meneusoft.api.news.NewsUtil;
+import com.lixingyong.meneusoft.common.exception.WSExcetpion;
 import com.lixingyong.meneusoft.common.utils.DateUtils;
+import com.lixingyong.meneusoft.common.utils.Params;
 import com.lixingyong.meneusoft.modules.xcx.entity.*;
 import com.lixingyong.meneusoft.modules.xcx.service.*;
+import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
+import java.time.LocalDate;
+import java.util.*;
+
 @Slf4j
 @Service("scheduledService")
 public class ScheduledServiceImpl implements ScheduledService {
@@ -29,6 +32,16 @@ public class ScheduledServiceImpl implements ScheduledService {
     private TermService termService;
     @Autowired
     private TermEventService termEventService;
+    @Autowired
+    private CourseService courseService;
+    @Autowired
+    private GradeService gradeService;
+    @Autowired
+    private CourseEvaluateService courseEvaluateService;
+    @Autowired
+    private CourseCountService courseCountService;
+    @Autowired
+    private CourseGradeService courseGradeService;
     @Override
     public void getContactBooksAndTeachers() {
         // 获取通讯录分类内容
@@ -36,8 +49,13 @@ public class ScheduledServiceImpl implements ScheduledService {
         for(ContactCategory contactCategory : contactCategories){
             List<ContactBook> contactBooks = new ArrayList<>();
             List<Teacher> teachers = ContactUtil.getContactBooksAndTeachers(contactCategory, contactBooks );
-            contactBookService.insertOrUpdateContactBooks(contactBooks);
-            teacherService.insertOrUpdateTeachers(teachers);
+            try {
+                log.info("开始更新" + contactCategory.getName() + "的通讯录");
+                contactBookService.insertOrUpdateContactBooks(contactBooks);
+                teacherService.insertOrUpdateTeachers(teachers);
+            }catch (Exception e){
+                log.error("更新" + contactCategory.getName()+"通讯录信息失败");
+            }
         }
     }
 
@@ -68,6 +86,129 @@ public class ScheduledServiceImpl implements ScheduledService {
             getTermEvents(term);
         }
         termService.addTermList(termList);
+    }
+
+    @Override
+    public void computeCourse() {
+        // 查询所有成绩数据
+        List<Course> courseList = courseService.getCourseAll();
+        List<CourseGrade> courseGradeList = new ArrayList<>();
+        List<CourseCount> courseCountList = new ArrayList<>();
+        int i = 1;
+        for(;i < courseList.size(); i++){
+            Course course = courseList.get(i);
+            // 获取本年度当前课程的所有成绩信息(根据课程号)
+            List<Grade> grades = gradeService.getGradeList(course.getCourseId());
+            CourseCount courseCount = new CourseCount();
+            if(!grades.isEmpty()){ // 如果当前课程有成绩信息
+                // 创建课程信息
+                CourseGrade courseGrade = new CourseGrade();
+                int g0 = 0, g60 = 0, g70 = 0, g80 = 0, g90 = 0;
+                int gradeAll = 0;
+                int fail = 0;
+                float allGrade = 0;
+                for(Grade grade : grades) {
+                    gradeAll++;
+                    allGrade += grade.getGrade();
+                    int g = Integer.valueOf(String.valueOf(grade.getGrade() / 10f).split("\\.")[0]);
+                    switch (g) {
+                        case 0:
+                        case 1:
+                        case 2:
+                        case 3:
+                        case 4:
+                        case 5:
+                            fail++;
+                            g0++;
+                            break;
+                        case 6:
+                            g60++;
+                            break;
+                        case 7:
+                            g70++;
+                            break;
+                        case 8:
+                            g80++;
+                            break;
+                        case 9:
+                        case 10:
+                            g90++;
+                            break;
+                    }
+                }
+                courseGrade.setId(course.getId());
+                courseGrade.setCourseId(course.getId());
+                courseGrade.setG0(g0);
+                courseGrade.setG60(g60);
+                courseGrade.setG70(g70);
+                courseGrade.setG80(g80);
+                courseGrade.setG90(g90);
+                courseGrade.setLessonId(course.getLessonId());
+
+
+                if(gradeAll != 0){
+                    courseCount.setFailRate(fail / (float)gradeAll);
+                    if(allGrade != 0){
+                        courseCount.setAvgGrade(allGrade / gradeAll);
+                    }else {
+                        courseCount.setAvgGrade(0);
+                    }
+                } else {
+                    courseCount.setFailRate(0);
+                }
+                courseCount.setId(course.getId());
+                courseCount.setCourseId(course.getId());
+                courseCount.setGradeAll(gradeAll);
+                courseCount.setLessonId(course.getLessonId());
+                courseGradeList.add(courseGrade);
+            }
+
+            // 获取当前课程的所有评价信息
+            List<CourseEvaluate> courseEvaluateList = courseEvaluateService.getCourseEvaluateList(course.getId());
+            if(!courseEvaluateList.isEmpty()){
+                int good = 0, normal = 0, bad = 0, flag = 0;
+                for(CourseEvaluate  courseEvaluate : courseEvaluateList){
+                    flag ++;
+                    switch (courseEvaluate.getAssess()){
+                        case 1:
+                            good ++;
+                            break;
+                        case 2:
+                            normal ++;
+                            break;
+                        case 3:
+                            bad ++;
+                            break;
+                    }
+                }
+                courseCount.setStar((good + normal + bad) / (float)flag);
+                courseCount.setGood(good);
+                courseCount.setNormal(normal);
+                courseCount.setBad(bad);
+            }
+
+            if(!grades.isEmpty() || !courseEvaluateList.isEmpty()){
+                courseCountList.add(courseCount);
+            }
+
+            if(i % 100 == 0){
+                // 每100条数据保存一次
+                if(!courseGradeList.isEmpty()){
+                    courseGradeService.insertOrUpdateCourseGradeAll(courseGradeList);
+                }
+                if(!courseCountList.isEmpty()){
+                    courseCountService.insertOrUpdateCourseCountAll(courseCountList);
+                }
+                courseCountList = new ArrayList<>();
+                courseGradeList = new ArrayList<>();
+            }
+        }
+        if(!courseGradeList.isEmpty()){
+            courseGradeService.insertOrUpdateCourseGradeAll(courseGradeList);
+        }
+        if(!courseCountList.isEmpty()){
+            courseCountService.insertOrUpdateCourseCountAll(courseCountList);
+        }
     }
 
     private void getTermEvents(Term term) {

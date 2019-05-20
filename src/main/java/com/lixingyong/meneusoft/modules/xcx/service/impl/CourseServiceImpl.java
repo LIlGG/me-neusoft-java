@@ -13,6 +13,7 @@ import com.lixingyong.meneusoft.modules.xcx.service.CourseService;
 import com.lixingyong.meneusoft.modules.xcx.vo.CourseParam;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
@@ -69,4 +70,21 @@ public class CourseServiceImpl extends ServiceImpl<CourseDao, Course> implements
     public Course getCourseList(long courseId) {
         return this.baseMapper.selectById(courseId);
     }
+
+    @Override
+    public Course getCourseList(String courseId) {
+        List<Course> courses = new ArrayList<>();
+        courses = this.selectList(new EntityWrapper<Course>().eq("course_id", courseId));
+        if(courses.isEmpty()){
+            return null;
+        }
+        return courses.get(0);
+    }
+
+    @Override
+    public List<Course> getCourseAll() {
+        return this.baseMapper.selectList(new EntityWrapper<>());
+    }
+
+
 }

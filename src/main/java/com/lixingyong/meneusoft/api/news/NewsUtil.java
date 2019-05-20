@@ -9,6 +9,7 @@ import com.lixingyong.meneusoft.modules.xcx.entity.Detail;
 import com.lixingyong.meneusoft.modules.xcx.entity.Lecture;
 import com.lixingyong.meneusoft.modules.xcx.entity.Tag;
 import com.lixingyong.meneusoft.modules.xcx.service.TagService;
+import org.apache.http.client.methods.HttpHead;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
@@ -16,6 +17,7 @@ import org.jsoup.select.Elements;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.client.RestTemplate;
@@ -43,7 +45,9 @@ public class NewsUtil {
      * @return
      **/
     public static List<Detail> getNewsList(String url){
-        HttpEntity<String> request = new HttpEntity<>(null,null);//将参数和header组成一个请求
+        HttpHeaders httpHeaders = new HttpHeaders();
+        httpHeaders.set("User-Agent","Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/74.0.3729.157 Safari/537.36");
+        HttpEntity<String> request = new HttpEntity<>(null,httpHeaders);//将参数和header组成一个请求
         ResponseEntity<String> responseEntity = restTemplate.exchange(url,HttpMethod.GET,request,String.class);
         if(responseEntity.getStatusCode().is2xxSuccessful()) {
             String html = responseEntity.getBody();
@@ -124,7 +128,9 @@ public class NewsUtil {
      * @return
      **/
     public static List<Tag> getTagList() {
-        HttpEntity<String> request = new HttpEntity<>(null,null);//将参数和header组成一个请求
+        HttpHeaders httpHeaders = new HttpHeaders();
+        httpHeaders.set("User-Agent","Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/74.0.3729.157 Safari/537.36");
+        HttpEntity<String> request = new HttpEntity<>(null,httpHeaders);//将参数和header组成一个请求
         ResponseEntity<String> responseEntity = restTemplate.exchange(NewsAPI.NEWS_HOME,HttpMethod.GET,request,String.class);
         if(responseEntity.getStatusCode().is2xxSuccessful()) {
             String html = responseEntity.getBody();
@@ -155,7 +161,9 @@ public class NewsUtil {
      * @return java.lang.String
      **/
     public static String getNewDetail(String url) {
-        HttpEntity<String> request = new HttpEntity<>(null,null);//将参数和header组成一个请求
+        HttpHeaders httpHeaders = new HttpHeaders();
+        httpHeaders.set("User-Agent","Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/74.0.3729.157 Safari/537.36");
+        HttpEntity<String> request = new HttpEntity<>(null,httpHeaders);//将参数和header组成一个请求
         ResponseEntity<String> responseEntity = restTemplate.exchange(url,HttpMethod.GET,request,String.class);
         if(responseEntity.getStatusCode().is2xxSuccessful()) {
             String html = responseEntity.getBody();
@@ -175,7 +183,9 @@ public class NewsUtil {
      * @return
      **/
     public static int getLecturePageCount(int count){
-        HttpEntity<String> request = new HttpEntity<>(null,null);//将参数和header组成一个请求
+        HttpHeaders httpHeaders = new HttpHeaders();
+        httpHeaders.set("User-Agent","Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/74.0.3729.157 Safari/537.36");
+        HttpEntity<String> request = new HttpEntity<>(null,httpHeaders);//将参数和header组成一个请求
         ResponseEntity<String> responseEntity = null;
         if(count == 0){
             responseEntity = restTemplate.exchange(NewsAPI.LECTURE,HttpMethod.GET,request,String.class);
@@ -208,7 +218,9 @@ public class NewsUtil {
      **/
     public static  List<Lecture> getLectures(int pageIndex) {
         List<Lecture> lectureList = new LinkedList<>();
-        HttpEntity<String> request = new HttpEntity<>(null,null);//将参数和header组成一个请求
+        HttpHeaders httpHeaders = new HttpHeaders();
+        httpHeaders.set("User-Agent","Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/74.0.3729.157 Safari/537.36");
+        HttpEntity<String> request = new HttpEntity<>(null,httpHeaders);//将参数和header组成一个请求
         ResponseEntity<String> responseEntity = restTemplate.exchange(NewsAPI.LECTURE + pageIndex + ".shtml",HttpMethod.GET,request,String.class);
         if(responseEntity.getStatusCode().is2xxSuccessful()){
             String body = responseEntity.getBody();
@@ -235,7 +247,9 @@ public class NewsUtil {
     }
 
     private static void getLectureDetail(String url, Lecture lecture) {
-        HttpEntity<String> request = new HttpEntity<>(null,null);//将参数和header组成一个请求
+        HttpHeaders httpHeaders = new HttpHeaders();
+        httpHeaders.set("User-Agent","Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/74.0.3729.157 Safari/537.36");
+        HttpEntity<String> request = new HttpEntity<>(null,httpHeaders);//将参数和header组成一个请求
         ResponseEntity<String> responseEntity = restTemplate.exchange(url, HttpMethod.GET, request,String.class);
         if(responseEntity.getStatusCode().is2xxSuccessful()) {
             String body = responseEntity.getBody();

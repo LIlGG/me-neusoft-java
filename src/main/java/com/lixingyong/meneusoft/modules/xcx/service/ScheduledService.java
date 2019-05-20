@@ -7,4 +7,5 @@ public interface ScheduledService {
 
     void getTerms();
 
+    void computeCourse();
 }

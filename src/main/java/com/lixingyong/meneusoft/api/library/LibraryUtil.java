@@ -44,6 +44,7 @@ public class LibraryUtil extends LibraryAbs {
         setCookies(new LinkedList<>());
         HttpHeaders headers = httpHeaders();
         headers.set("Content-Type","application/x-www-form-urlencoded;charset=ISO-8859-1");
+        headers.set("User-Agent","Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/74.0.3729.157 Safari/537.36");
         // 判断redis中是否存着对应的Cookie
         MultiValueMap<String,String> param = new LinkedMultiValueMap<>();
         param.add("barcode", barcode);
@@ -191,8 +192,8 @@ public class LibraryUtil extends LibraryAbs {
     public static BookSearchVO bookSearch(String title, int curPage){
         setCookies(new LinkedList<>());
         HttpHeaders headers = httpHeaders();
+        headers.set("User-Agent","Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/74.0.3729.157 Safari/537.36");
         headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
-
         MultiValueMap<String,String> param = new LinkedMultiValueMap<>();
         param.add("type","title");
         try {

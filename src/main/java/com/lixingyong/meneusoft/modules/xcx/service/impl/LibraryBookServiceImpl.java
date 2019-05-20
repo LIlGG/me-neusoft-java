@@ -59,10 +59,6 @@ public class LibraryBookServiceImpl extends ServiceImpl<LibraryBookDao, LibraryB
 
     @Override
     public DetailBookVO getBookDetail(String detailId) throws WSExcetpion {
-        // 登录VPN
-        if(!LoginUtil.exeVpnLogin()){
-            return null;
-        }
         DetailBookVO detailBookVO = LibraryUtil.detailBook(detailId);
         return detailBookVO;
     }

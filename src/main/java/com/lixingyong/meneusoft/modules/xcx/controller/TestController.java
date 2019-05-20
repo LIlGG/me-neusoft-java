@@ -7,6 +7,7 @@ import com.lixingyong.meneusoft.modules.xcx.entity.CourseSchedule;
 import com.lixingyong.meneusoft.modules.xcx.service.ClassroomService;
 import com.lixingyong.meneusoft.modules.xcx.service.CourseScheduleService;
 import com.lixingyong.meneusoft.modules.xcx.service.CourseService;
+import com.lixingyong.meneusoft.modules.xcx.service.ScheduledService;
 import com.lixingyong.meneusoft.modules.xcx.utils.LoginUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.jsoup.Jsoup;
@@ -35,6 +36,8 @@ public class TestController {
     private CourseService courseService;
     @Autowired
     private CourseScheduleService courseScheduleService;
+    @Autowired
+    private ScheduledService scheduledService;
     @RequestMapping("/classroom")
     public void classroom(){
         LoginUtil.exeJWCLogin(1);
@@ -67,5 +70,21 @@ public class TestController {
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+    @RequestMapping("/contact")
+    public void getContactBookData(){
+        log.info("执行获取通讯录信息");
+        scheduledService.getContactBooksAndTeachers();
+        log.info("结束获取通讯录");
+    }
+
+    @RequestMapping("/computeGrade")
+    public void getComputeGrade(){
+        // 计算每一个课程的成绩平均值及课程评价
+        log.info("开始计算课程的成绩平均值");
+        scheduledService.computeCourse();
+        log.info("结束计算课程的成绩平均值");
+        log.info("开始计算课程评价");
+        log.info("结束计算课程评价");
     }
 }

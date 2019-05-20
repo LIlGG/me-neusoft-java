@@ -17,4 +17,8 @@ public interface CourseService extends IService<Course> {
     List<Course> getCourseList(HashMap<String, String> parms);
 
     Course getCourseList(long courseId);
+
+    Course getCourseList(String courseId);
+
+    List<Course> getCourseAll();
 }

@@ -71,7 +71,9 @@ public class NeusoftUtil extends NeusoftAbs {
     public static List<TermEvent> getTermEvents(int id, String date) {
         setCookies(new LinkedList<>());
         ArrayList<TermEvent> termEvents = new ArrayList<>();
-        HttpEntity<MultiValueMap<String,Object>> request = new HttpEntity<>(null,null);//将参数和header组成一个请求
+        HttpHeaders httpHeaders = new HttpHeaders();
+        httpHeaders.set("User-Agent","Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/74.0.3729.157 Safari/537.36");
+        HttpEntity<MultiValueMap<String,Object>> request = new HttpEntity<>(null,httpHeaders);//将参数和header组成一个请求
         String[] ym = date.split("-");
         map = new HashMap<>();
         map.put("year",ym[0]);

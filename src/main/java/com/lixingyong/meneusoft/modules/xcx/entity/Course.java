@@ -15,7 +15,6 @@ public class Course extends BaseEntity {
     @TableId(type= IdType.INPUT)
     private long id;
     /** 课程号 */
-
     private String courseId;
     /** 课程名 */
     private String name;

@@ -10,6 +10,7 @@ import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.client.RestTemplate;
@@ -26,7 +27,9 @@ public class ContactUtil {
     private static RestTemplate restTemplate = RestConfig.getRestTemplate();
 
     public static List<Teacher> getContactBooksAndTeachers(ContactCategory contactCategory, List<ContactBook> contactBooks) throws WSExcetpion {
-        HttpEntity<String> request = new HttpEntity<>(null, null);
+        HttpHeaders httpHeaders = new HttpHeaders();
+        httpHeaders.set("User-Agent","Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/74.0.3729.157 Safari/537.36");
+        HttpEntity<String> request = new HttpEntity<>(null, httpHeaders);
         List<Teacher> teachers = null;
         try {
             ResponseEntity<String> responseEntity = restTemplate.exchange(URLDecoder.decode(contactCategory.getUrl(), "UTF-8"), HttpMethod.GET,request,String.class);

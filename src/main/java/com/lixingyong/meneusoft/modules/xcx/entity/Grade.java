@@ -18,6 +18,8 @@ public class Grade extends BaseEntity {
 
     private String courseName;
 
+    private String lessonId;
+
     private String credit;
 
     private String courseType;

@@ -17,4 +17,6 @@ public interface CourseScheduleService extends IService<CourseSchedule> {
     List<CourseSchedule> getCourseScheduleList(HashMap<String, String> params);
 
     List<CourseSchedule> getSearchCourseList(long id, HashMap<String, String> params);
+
+    List<CourseSchedule> getCourseList(Long courseId);
 }

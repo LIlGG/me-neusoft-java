@@ -63,4 +63,9 @@ public class CourseScheduleServiceImpl extends ServiceImpl<CourseScheduleDao, Co
         wrapper.eq("course_id", id);
         return this.baseMapper.selectList(wrapper);
     }
+
+    @Override
+    public List<CourseSchedule> getCourseList(Long courseId) {
+        return this.baseMapper.selectList(new EntityWrapper<CourseSchedule>().eq("course_id",courseId));
+    }
 }

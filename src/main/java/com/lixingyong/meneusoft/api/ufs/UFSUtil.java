@@ -3,6 +3,7 @@ package com.lixingyong.meneusoft.api.ufs;
 import com.lixingyong.meneusoft.api.RestConfig;
 import com.lixingyong.meneusoft.common.exception.WSExcetpion;
 import com.lixingyong.meneusoft.common.utils.RedisUtils;
+import com.lixingyong.meneusoft.modules.xcx.entity.Course;
 import com.lixingyong.meneusoft.modules.xcx.entity.Grade;
 import com.lixingyong.meneusoft.modules.xcx.entity.User;
 import com.lixingyong.meneusoft.modules.xcx.service.UserService;
@@ -61,6 +62,7 @@ public class UFSUtil  extends UFSAbs{
         HttpHeaders headers = httpHeaders();
         //headers.setHost(InetSocketAddress.createUnresolved(HOST(),80));
         headers.set("Content-Type","application/x-www-form-urlencoded;charset=GBK");
+        headers.set("User-Agent","Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/74.0.3729.157 Safari/537.36");
         // 将cookie放入header
         MultiValueMap<String,String> param = new LinkedMultiValueMap<>();
         param.add("username", account);
@@ -133,6 +135,7 @@ public class UFSUtil  extends UFSAbs{
         loginVail(userId);
         setCookies(userId+"UFS");
         HttpHeaders headers = httpHeaders();
+        headers.set("User-Agent","Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/74.0.3729.157 Safari/537.36");
         headers.set("Content-Type","application/x-www-form-urlencoded;charset=GBK");
         //登录前首先获取本次登录所需cookie
         MultiValueMap<String, String> params = new LinkedMultiValueMap<>();
@@ -179,7 +182,20 @@ public class UFSUtil  extends UFSAbs{
             grade.setId(id);
             grade.setCourseId(tds.get(0).text());
             grade.setCourseName(tds.get(1).text());
-            grade.setCourseType("必修");
+            try {
+                Course course = courseService.getCourseList(tds.get(0).text());
+                if(course == null){
+                    grade.setCourseType("必修");
+                } else {
+                    grade.setCourseType(course.getType());
+                    grade.setLessonId(course.getLessonId());
+                    if(grade.getCourseType().equals("/")){
+                        grade.setCourseType("必修");
+                    }
+                }
+            }catch (Exception e) {
+                grade.setCourseType("必修");
+            }
             grade.setCredit(tds.get(2).text());
             grade.setGrade(Float.valueOf(tds.get(3).text()));
             grade.setGpa(Float.valueOf(tds.get(4).text()));

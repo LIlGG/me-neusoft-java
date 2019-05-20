@@ -10,6 +10,9 @@ import com.lixingyong.meneusoft.modules.xcx.service.ContactBookService;
 import com.lixingyong.meneusoft.modules.xcx.service.GradeService;
 import org.springframework.stereotype.Service;
 
+import javax.xml.crypto.Data;
+import java.time.LocalDate;
+import java.util.Date;
 import java.util.List;
 
 ;
@@ -37,5 +40,10 @@ public class GradeServiceImpl extends ServiceImpl<GradeDao, Grade> implements Gr
     @Override
     public void delGradeAll(Integer userId) {
         this.baseMapper.delete(new EntityWrapper<Grade>().eq("user_id", userId));
+    }
+
+    @Override
+    public List<Grade> getGradeList(String courseId) {
+        return this.baseMapper.selectList(new EntityWrapper<Grade>().eq("course_id", courseId));
     }
 }

@@ -14,4 +14,6 @@ public interface GradeService extends IService<Grade> {
     void insertOrUpdateGrades(List<Grade> grades);
 
     void delGradeAll(Integer userId);
+
+    List<Grade> getGradeList(String courseId);
 }

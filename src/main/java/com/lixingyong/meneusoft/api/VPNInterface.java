@@ -12,7 +12,7 @@ import org.springframework.web.client.RestTemplate;
 import java.util.*;
 
 public abstract class VPNInterface {
-    private static boolean isVPN = true;
+    private static boolean isVPN = false;
     protected static RestTemplate restTemplate = RestConfig.getRestTemplate();
     protected static RedisUtils redisUtils = RestConfig.getRedisUtils();
     protected static Map<String,Object> map;
@@ -30,6 +30,7 @@ public abstract class VPNInterface {
      */
     protected static HttpHeaders httpHeaders() throws WSExcetpion {
         HttpHeaders httpHeaders = new HttpHeaders();
+        httpHeaders.set("User-Agent","Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/74.0.3729.157 Safari/537.36");
         httpHeaders.put(HttpHeaders.COOKIE,getCookies());
         return httpHeaders;
     }

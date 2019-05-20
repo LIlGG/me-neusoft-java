@@ -38,6 +38,7 @@ public class  VPNUtil {
         logger.debug("检测VPN登录状态");
         //获取Header
         HttpHeaders headers = new HttpHeaders();
+        headers.set("User-Agent","Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/74.0.3729.157 Safari/537.36");
         //判断是否存在SVPNSESSION
         /** 获取redis保存的cookies */
         if(!redisUtils.hasKey("SVPNCOOKIE")){

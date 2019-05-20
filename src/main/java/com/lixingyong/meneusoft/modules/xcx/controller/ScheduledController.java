@@ -46,4 +46,16 @@ public class ScheduledController {
         log.info("结束更新校历信息");
     }
 
+    /**
+     * 定时更新成绩及课程统计（一天更新一次，更新时间为每天3点）
+     */
+    @Scheduled(cron = "0 0 3 * * ?")
+    public void getComputeGrade(){
+        // 计算每一个课程的成绩平均值及课程评价
+        log.info("开始计算课程的成绩平均值");
+        scheduledService.computeCourse();
+        log.info("结束计算课程的成绩平均值");
+        log.info("开始计算课程评价");
+        log.info("结束计算课程评价");
+    }
 }
